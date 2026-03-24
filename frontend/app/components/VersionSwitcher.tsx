@@ -11,7 +11,6 @@ interface VersionSwitcherProps {
   }[]
   currentVersionName: string | null
   locale: string
-  collection: string
   model: string
 }
 
@@ -19,7 +18,6 @@ export function VersionSwitcher({
   options,
   currentVersionName,
   locale,
-  collection,
   model,
 }: VersionSwitcherProps) {
   const router = useRouter()
@@ -27,7 +25,7 @@ export function VersionSwitcher({
   if (!options?.length) return null
 
   const handleChange = (versionName: string) => {
-    const base = `/${locale}/products/${collection}/${model}`
+    const base = `/${locale}/products/${model}`
     const selected = options.find((v) => v.versionName === versionName)
     const href = selected?.isDefault ? base : `${base}/${encodeURIComponent(versionName)}`
     router.push(href)

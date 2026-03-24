@@ -6,12 +6,7 @@ import {structure} from './src/structure'
 import {unsplashImageAsset} from 'sanity-plugin-asset-source-unsplash'
 import {colorInput} from '@sanity/color-input'
 import {documentInternationalization} from '@sanity/document-internationalization'
-import {
-  presentationTool,
-  defineDocuments,
-  defineLocations,
-  type DocumentLocation,
-} from 'sanity/presentation'
+import {presentationTool, defineDocuments, defineLocations} from 'sanity/presentation'
 import {assist} from '@sanity/assist'
 import {DEFAULT_LOCALE, isValidLocale, SUPPORTED_LANGUAGES} from 'shared'
 
@@ -19,17 +14,21 @@ const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'wh4ayjq9'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'internationalization'
 const SANITY_STUDIO_PREVIEW_URL = process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:3000'
 
-const homeLocation = {
-  title: 'Home',
-  href: '/',
-} satisfies DocumentLocation
-
-function resolveHref(documentType: string, locale: string, slug?: string): string | undefined {
+function resolveHref(
+  documentType: string,
+  locale: string,
+  slug?: string,
+  version?: string,
+): string | undefined {
   switch (documentType) {
     case 'page':
-      return slug ? `/${locale}/${slug}` : `${locale}/`
+      return slug ? `/${locale}/${slug}` : `/${locale}`
     case 'productPage':
       return slug ? `/${locale}/products/${slug}` : undefined
+    case 'versionedProductPage':
+      return slug ? `/${locale}/products/${slug}/${version}` : undefined
+    case 'collection':
+      return slug ? `/${locale}/collections/${slug}` : undefined
     default:
       return undefined
   }
@@ -60,6 +59,15 @@ export default defineConfig({
             route: '/:locale/products/:slug',
             filter: `_type == "productPage" && language == $locale && slug.current == $slug`,
           },
+          {
+            route: '/:locale/products/:slug/:version',
+            filter: `_type == "productPage" && language == $locale && slug.current == $slug && versions.versionName == $version`,
+          },
+          {
+            route: '/:locale/collections/:slug',
+            filter: `_type == "collection" && language == $locale && slug.current == $slug`,
+          },
+
           {
             route: '/:locale/products/:collection',
             resolve(ctx) {
@@ -104,10 +112,44 @@ export default defineConfig({
             },
           }),
           productPage: defineLocations({
-            select: {title: 'title', slug: 'slug.current', locale: 'language'},
+            select: {
+              title: 'title',
+              slug: 'slug.current',
+              locale: 'language',
+
+              version: 'versions',
+            },
 
             resolve: (doc) => {
-              const href = resolveHref('productPage', doc?.locale || DEFAULT_LOCALE, doc?.slug)!
+              const versioned = doc?.version
+                ? {
+                    title: doc?.title || 'Untitled',
+                    href: resolveHref(
+                      'versionedProductPage',
+                      doc?.locale || DEFAULT_LOCALE,
+                      doc?.slug,
+                      doc?.version,
+                    )!,
+                  }
+                : undefined
+
+              console.log('VERSIONED: ', {doc, versioned})
+
+              return {
+                message: 'Open in Presentation for visual editing',
+                locations: [
+                  {
+                    title: doc?.title || 'Untitled',
+                    href: resolveHref('productPage', doc?.locale || DEFAULT_LOCALE, doc?.slug)!,
+                  },
+                ].concat(versioned ? [versioned] : []),
+              }
+            },
+          }),
+          collection: defineLocations({
+            select: {title: 'title', slug: 'slug.current', locale: 'language'},
+            resolve: (doc) => {
+              const href = resolveHref('collection', doc?.locale || DEFAULT_LOCALE, doc?.slug)!
               return {
                 message: 'Open in Presentation for visual editing',
                 locations: [

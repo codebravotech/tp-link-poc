@@ -6,11 +6,11 @@ import {localizedProductsByCollectionQuery} from '@/sanity/lib/queries'
 import {isValidLocale} from '@/sanity/lib/locale'
 
 interface CollectionPageProps {
-  params: Promise<{locale: string; collection: string}>
+  params: Promise<{locale: string; slug: string}>
 }
 
 export default async function CollectionPage({params}: CollectionPageProps) {
-  const {locale, collection} = await params
+  const {locale, slug: collection} = await params
   if (!isValidLocale(locale)) notFound()
 
   const {data: products} = await sanityFetch({
@@ -28,7 +28,7 @@ export default async function CollectionPage({params}: CollectionPageProps) {
         {products?.map((product: any) => (
           <li key={product._id}>
             <Link
-              href={`/${locale}/products/${product.collectionSlug ?? collection}/${product.slug ?? ''}`}
+              href={`/${locale}/products/${product.slug ?? ''}`}
               className="block rounded-lg border border-slate-200 p-4 transition hover:border-green-600 hover:shadow-md"
             >
               {product.images?.[0]?.assetUrl && (

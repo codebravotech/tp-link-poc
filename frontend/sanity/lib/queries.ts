@@ -16,7 +16,7 @@ const linkFields = /* groq */ `
 `
 
 export const getPageQuery = defineQuery(`
-  *[_type == 'page' && slug.current == $slug][0]{
+  *[_type == 'page' && slug.current == $slug && language == $locale][0]{
     _id,
     _type,
     name,

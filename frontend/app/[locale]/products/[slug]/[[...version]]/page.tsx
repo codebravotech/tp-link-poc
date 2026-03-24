@@ -9,8 +9,7 @@ import {productComponentMap} from '@/app/lib/productComponentMap'
 interface ProductPageProps {
   params: Promise<{
     locale: string
-    collection: string
-    model: string
+    slug: string
     version?: string[]
   }>
 }
@@ -48,7 +47,7 @@ function getActiveEntry(
 }
 
 export default async function LocalizedProductPage({params}: ProductPageProps) {
-  const {locale, collection, model, version: versionSegments} = await params
+  const {locale, slug: model, version: versionSegments} = await params
   if (!isValidLocale(locale)) notFound()
 
   const {data: productPage} = await sanityFetch({
@@ -63,8 +62,11 @@ export default async function LocalizedProductPage({params}: ProductPageProps) {
   const entries = (productPage as any).products ?? []
   const {activeEntry, defaultEntry, currentVersionName} = getActiveEntry(entries, versionSegments)
 
-  const effectiveEntry =
-    activeEntry?.product ? activeEntry : defaultEntry?.product ? defaultEntry : null
+  const effectiveEntry = activeEntry?.product
+    ? activeEntry
+    : defaultEntry?.product
+      ? defaultEntry
+      : null
 
   if (!effectiveEntry?.product) notFound()
 
@@ -79,9 +81,7 @@ export default async function LocalizedProductPage({params}: ProductPageProps) {
             {product.images?.length ? (
               <ProductHeroCarousel images={product.images} />
             ) : (
-              <div className="flex h-full items-center justify-center text-slate-400">
-                No image
-              </div>
+              <div className="flex h-full items-center justify-center text-slate-400">No image</div>
             )}
           </div>
           <div>
@@ -103,7 +103,6 @@ export default async function LocalizedProductPage({params}: ProductPageProps) {
                     }))}
                   currentVersionName={currentVersionName}
                   locale={locale}
-                  collection={collection}
                   model={model}
                 />
               )}

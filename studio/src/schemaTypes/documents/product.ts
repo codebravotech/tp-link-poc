@@ -44,8 +44,8 @@ export const product = defineType({
     defineField({
       name: 'collection',
       title: 'Collection',
-      type: 'reference',
-      to: [{type: 'collection'}],
+      type: 'array',
+      of: [{type: 'reference', to: [{type: 'collection'}]}],
       validation: (Rule) => Rule.required(),
       readOnly: adminOnlyReadOnly,
     }),
