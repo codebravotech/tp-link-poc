@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@sanity/assist": "^5.0.2",
+    "@sanity/color-input": "^6.0.4",
+    "@sanity/document-internationalization": "^6.0.5",
     "@sanity/icons": "^3.7.4",
     "@sanity/vision": "^5.1.0",
     "date-fns": "^4.1.0",

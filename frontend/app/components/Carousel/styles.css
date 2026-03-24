@@ -1,0 +1,21 @@
+.product-hero-main {
+  background-color: transparent;
+}
+
+.product-hero-thumbs {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: transparent;
+}
+
+.product-hero-thumbs .swiper-slide {
+  opacity: 0.65;
+}
+
+.product-hero-thumbs .swiper-slide-thumb-active {
+  opacity: 1;
+}
+
+.swiper-wrapper {
+  background-color: transparent;
+}

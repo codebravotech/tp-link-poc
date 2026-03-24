@@ -13,6 +13,41 @@
  */
 
 // Source: ../sanity.schema.json
+export type SanityImageAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+}
+
+export type FeatureColumn = {
+  _type: 'featureColumn'
+  image: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  icon?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  title: string
+  description?: string
+}
+
+export type NavLink = {
+  _type: 'navLink'
+  title: string
+  href: string
+}
+
 export type PageReference = {
   _ref: string
   _type: 'reference'
@@ -20,27 +55,12 @@ export type PageReference = {
   [internalGroqTypeReferenceTo]?: 'page'
 }
 
-export type PostReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'post'
-}
-
 export type Link = {
   _type: 'link'
-  linkType?: 'href' | 'page' | 'post'
+  linkType?: 'href' | 'page'
   href?: string
   page?: PageReference
-  post?: PostReference
   openInNewTab?: boolean
-}
-
-export type SanityImageAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
 }
 
 export type CallToAction = {
@@ -97,10 +117,9 @@ export type BlockContent = Array<
       style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
       listItem?: 'bullet' | 'number'
       markDefs?: Array<{
-        linkType?: 'href' | 'page' | 'post'
+        linkType?: 'href' | 'page'
         href?: string
         page?: PageReference
-        post?: PostReference
         openInNewTab?: boolean
         _type: 'link'
         _key: string
@@ -125,44 +144,30 @@ export type Button = {
   link?: Link
 }
 
-export type Settings = {
+export type LegacyMigration = {
   _id: string
-  _type: 'settings'
+  _type: 'legacyMigration'
   _createdAt: string
   _updatedAt: string
   _rev: string
   title: string
-  description?: Array<{
-    children?: Array<{
-      marks?: Array<string>
-      text?: string
-      _type: 'span'
+  externalAssets?: Array<string>
+  bodyHtml: string
+  legacyClassName?: string
+}
+
+export type FeatureOverviewBlock = {
+  _id: string
+  _type: 'featureOverviewBlock'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  columns?: Array<
+    {
       _key: string
-    }>
-    style?: 'normal'
-    listItem?: never
-    markDefs?: Array<{
-      linkType?: 'href' | 'page' | 'post'
-      href?: string
-      page?: PageReference
-      post?: PostReference
-      openInNewTab?: boolean
-      _type: 'link'
-      _key: string
-    }>
-    level?: number
-    _type: 'block'
-    _key: string
-  }>
-  ogImage?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    metadataBase?: string
-    _type: 'image'
-  }
+    } & FeatureColumn
+  >
 }
 
 export type SanityImageCrop = {
@@ -181,44 +186,32 @@ export type SanityImageHotspot = {
   width: number
 }
 
-export type Page = {
+export type ContentImageBlock = {
   _id: string
-  _type: 'page'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  name: string
-  slug: Slug
-  heading: string
-  subheading?: string
-  pageBuilder?: Array<
-    | ({
-        _key: string
-      } & CallToAction)
-    | ({
-        _key: string
-      } & InfoSection)
-  >
-}
-
-export type PersonReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'person'
-}
-
-export type Post = {
-  _id: string
-  _type: 'post'
+  _type: 'contentImageBlock'
   _createdAt: string
   _updatedAt: string
   _rev: string
   title: string
-  slug: Slug
-  content?: BlockContent
-  excerpt?: string
-  coverImage?: {
+  description?: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
+    listItem?: 'bullet' | 'number'
+    markDefs?: Array<{
+      href?: string
+      _type: 'link'
+      _key: string
+    }>
+    level?: number
+    _type: 'block'
+    _key: string
+  }>
+  image: {
     asset?: SanityImageAssetReference
     media?: unknown
     hotspot?: SanityImageHotspot
@@ -226,8 +219,193 @@ export type Post = {
     alt?: string
     _type: 'image'
   }
-  date?: string
-  author?: PersonReference
+  imagePosition?: 'right' | 'left'
+}
+
+export type IconReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'icon'
+}
+
+export type IconOverview = {
+  _id: string
+  _type: 'iconOverview'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  icons?: Array<
+    {
+      _key: string
+    } & IconReference
+  >
+}
+
+export type Icon = {
+  _id: string
+  _type: 'icon'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  iconImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+}
+
+export type HighlightsHero = {
+  _id: string
+  _type: 'highlightsHero'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  description?: string
+  modelNumber?: string
+  bgDesktopImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  bgMobileImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+}
+
+export type Footer = {
+  _id: string
+  _type: 'footer'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  footerLinks?: Array<
+    {
+      _key: string
+    } & NavLink
+  >
+  footerText?: string
+}
+
+export type Header = {
+  _id: string
+  _type: 'header'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  logoText: string
+  logoImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  navLinks?: Array<
+    {
+      _key: string
+    } & NavLink
+  >
+}
+
+export type ProductReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'product'
+}
+
+export type HighlightsHeroReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'highlightsHero'
+}
+
+export type IconOverviewReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'iconOverview'
+}
+
+export type ContentImageBlockReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'contentImageBlock'
+}
+
+export type FeatureOverviewBlockReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'featureOverviewBlock'
+}
+
+export type LegacyMigrationReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'legacyMigration'
+}
+
+export type ProductPage = {
+  _id: string
+  _type: 'productPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  title: string
+  slug?: Slug
+  products: Array<{
+    product: ProductReference
+    isDefault?: boolean
+    _type: 'productEntry'
+    _key: string
+  }>
+  components?: Array<
+    | ({
+        _key: string
+      } & HighlightsHeroReference)
+    | ({
+        _key: string
+      } & IconOverviewReference)
+    | ({
+        _key: string
+      } & ContentImageBlockReference)
+    | ({
+        _key: string
+      } & FeatureOverviewBlockReference)
+    | ({
+        _key: string
+      } & LegacyMigrationReference)
+  >
+  metaTitle?: string
+  metaDescription?: string
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
 }
 
 export type Person = {
@@ -248,10 +426,73 @@ export type Person = {
   }
 }
 
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
+export type Settings = {
+  _id: string
+  _type: 'settings'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  description?: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal'
+    listItem?: never
+    markDefs?: Array<{
+      linkType?: 'href' | 'page'
+      href?: string
+      page?: PageReference
+      openInNewTab?: boolean
+      _type: 'link'
+      _key: string
+    }>
+    level?: number
+    _type: 'block'
+    _key: string
+  }>
+  primaryBrandColor?: Color
+  ogImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    metadataBase?: string
+    _type: 'image'
+  }
+}
+
+export type Color = {
+  _type: 'color'
+  hex?: string
+  alpha?: number
+  hsl?: HslaColor
+  hsv?: HsvaColor
+  rgb?: RgbaColor
+}
+
+export type Page = {
+  _id: string
+  _type: 'page'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  slug: Slug
+  heading: string
+  subheading?: string
+  pageBuilder?: Array<
+    | ({
+        _key: string
+      } & CallToAction)
+    | ({
+        _key: string
+      } & InfoSection)
+  >
 }
 
 export type SanityAssistInstructionTask = {
@@ -391,6 +632,129 @@ export type SanityAssistSchemaTypeField = {
   >
 }
 
+export type TranslationMetadata = {
+  _id: string
+  _type: 'translation.metadata'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  translations?: InternationalizedArrayReference
+  schemaTypes?: Array<string>
+}
+
+export type InternationalizedArrayReference = Array<
+  {
+    _key: string
+  } & InternationalizedArrayReferenceValue
+>
+
+export type CollectionReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'collection'
+}
+
+export type InternationalizedArrayReferenceValue = {
+  _type: 'internationalizedArrayReferenceValue'
+  value?: ProductReference | CollectionReference
+  language: string
+}
+
+export type Product = {
+  _id: string
+  _type: 'product'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name?: string
+  modelNumber?: string
+  productId: number
+  slug?: string
+  collection: CollectionReference
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  images: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+    _key: string
+  }>
+  features?: Array<string>
+  links?: Array<{
+    label?: string
+    url?: string
+    _key: string
+  }>
+  versions?: {
+    versionName?: string
+    description?: string
+  }
+}
+
+export type Collection = {
+  _id: string
+  _type: 'collection'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  description?: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
+    listItem?: 'bullet' | 'number'
+    markDefs?: Array<{
+      href?: string
+      _type: 'link'
+      _key: string
+    }>
+    level?: number
+    _type: 'block'
+    _key: string
+  }>
+}
+
+export type RgbaColor = {
+  _type: 'rgbaColor'
+  r?: number
+  g?: number
+  b?: number
+  a?: number
+}
+
+export type HsvaColor = {
+  _type: 'hsvaColor'
+  h?: number
+  s?: number
+  v?: number
+  a?: number
+}
+
+export type HslaColor = {
+  _type: 'hslaColor'
+  h?: number
+  s?: number
+  l?: number
+  a?: number
+}
+
 export type SanityImagePaletteSwatch = {
   _type: 'sanity.imagePaletteSwatch'
   background?: string
@@ -488,23 +852,39 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
-  | PageReference
-  | PostReference
-  | Link
   | SanityImageAssetReference
+  | FeatureColumn
+  | NavLink
+  | PageReference
+  | Link
   | CallToAction
   | InfoSection
   | BlockContentTextOnly
   | BlockContent
   | Button
-  | Settings
+  | LegacyMigration
+  | FeatureOverviewBlock
   | SanityImageCrop
   | SanityImageHotspot
-  | Page
-  | PersonReference
-  | Post
-  | Person
+  | ContentImageBlock
+  | IconReference
+  | IconOverview
+  | Icon
+  | HighlightsHero
+  | Footer
+  | Header
+  | ProductReference
+  | HighlightsHeroReference
+  | IconOverviewReference
+  | ContentImageBlockReference
+  | FeatureOverviewBlockReference
+  | LegacyMigrationReference
+  | ProductPage
   | Slug
+  | Person
+  | Settings
+  | Color
+  | Page
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus
   | SanityAssistSchemaTypeAnnotations
@@ -518,6 +898,15 @@ export type AllSanitySchemaTypes =
   | SanityAssistInstructionFieldRef
   | SanityAssistInstruction
   | SanityAssistSchemaTypeField
+  | TranslationMetadata
+  | InternationalizedArrayReference
+  | CollectionReference
+  | InternationalizedArrayReferenceValue
+  | Product
+  | Collection
+  | RgbaColor
+  | HsvaColor
+  | HslaColor
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
@@ -549,10 +938,9 @@ export type SettingsQueryResult = {
     style?: 'normal'
     listItem?: never
     markDefs?: Array<{
-      linkType?: 'href' | 'page' | 'post'
+      linkType?: 'href' | 'page'
       href?: string
       page?: PageReference
-      post?: PostReference
       openInNewTab?: boolean
       _type: 'link'
       _key: string
@@ -561,6 +949,7 @@ export type SettingsQueryResult = {
     _type: 'block'
     _key: string
   }>
+  primaryBrandColor?: Color
   ogImage?: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -574,7 +963,7 @@ export type SettingsQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: getPageQuery
-// Query: *[_type == 'page' && slug.current == $slug][0]{    _id,    _type,    name,    slug,    heading,    subheading,    "pageBuilder": pageBuilder[]{      ...,      _type == "callToAction" => {        ...,        button {          ...,            link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }        }      },      _type == "infoSection" => {        content[]{          ...,          markDefs[]{            ...,              _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }          }        }      },    },  }
+// Query: *[_type == 'page' && slug.current == $slug][0]{    _id,    _type,    name,    slug,    heading,    subheading,    "pageBuilder": pageBuilder[]{      ...,      _type == "callToAction" => {        ...,        button {          ...,            link {      ...,        _type == "link" => {    "page": page->slug.current,  }      }        }      },      _type == "infoSection" => {        content[]{          ...,          markDefs[]{            ...,              _type == "link" => {    "page": page->slug.current,  }          }        }      },    },  }
 export type GetPageQueryResult = {
   _id: string
   _type: 'page'
@@ -594,10 +983,9 @@ export type GetPageQueryResult = {
           buttonText?: string
           link: {
             _type: 'link'
-            linkType?: 'href' | 'page' | 'post'
+            linkType?: 'href' | 'page'
             href?: string
             page: string | null
-            post: string | null
             openInNewTab?: boolean
           } | null
         } | null
@@ -627,10 +1015,9 @@ export type GetPageQueryResult = {
               style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
               listItem?: 'bullet' | 'number'
               markDefs: Array<{
-                linkType?: 'href' | 'page' | 'post'
+                linkType?: 'href' | 'page'
                 href?: string
                 page: string | null
-                post: string | null
                 openInNewTab?: boolean
                 _type: 'link'
                 _key: string
@@ -655,154 +1042,11 @@ export type GetPageQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: sitemapData
-// Query: *[_type == "page" || _type == "post" && defined(slug.current)] | order(_type asc) {    "slug": slug.current,    _type,    _updatedAt,  }
-export type SitemapDataResult = Array<
-  | {
-      slug: string
-      _type: 'page'
-      _updatedAt: string
-    }
-  | {
-      slug: string
-      _type: 'post'
-      _updatedAt: string
-    }
->
-
-// Source: sanity/lib/queries.ts
-// Variable: allPostsQuery
-// Query: *[_type == "post" && defined(slug.current)] | order(date desc, _updatedAt desc) {      _id,  "status": select(_originalId in path("drafts.**") => "draft", "published"),  "title": coalesce(title, "Untitled"),  "slug": slug.current,  excerpt,  coverImage,  "date": coalesce(date, _updatedAt),  "author": author->{firstName, lastName, picture},  }
-export type AllPostsQueryResult = Array<{
-  _id: string
-  status: 'draft' | 'published'
-  title: string
+// Query: *[_type == "page" && defined(slug.current)] | order(_type asc) {    "slug": slug.current,    _type,    _updatedAt,  }
+export type SitemapDataResult = Array<{
   slug: string
-  excerpt: string | null
-  coverImage: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  } | null
-  date: string
-  author: {
-    firstName: string
-    lastName: string
-    picture: {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      alt?: string
-      _type: 'image'
-    }
-  } | null
-}>
-
-// Source: sanity/lib/queries.ts
-// Variable: morePostsQuery
-// Query: *[_type == "post" && _id != $skip && defined(slug.current)] | order(date desc, _updatedAt desc) [0...$limit] {      _id,  "status": select(_originalId in path("drafts.**") => "draft", "published"),  "title": coalesce(title, "Untitled"),  "slug": slug.current,  excerpt,  coverImage,  "date": coalesce(date, _updatedAt),  "author": author->{firstName, lastName, picture},  }
-export type MorePostsQueryResult = Array<{
-  _id: string
-  status: 'draft' | 'published'
-  title: string
-  slug: string
-  excerpt: string | null
-  coverImage: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  } | null
-  date: string
-  author: {
-    firstName: string
-    lastName: string
-    picture: {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      alt?: string
-      _type: 'image'
-    }
-  } | null
-}>
-
-// Source: sanity/lib/queries.ts
-// Variable: postQuery
-// Query: *[_type == "post" && slug.current == $slug] [0] {    content[]{    ...,    markDefs[]{      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }    }  },      _id,  "status": select(_originalId in path("drafts.**") => "draft", "published"),  "title": coalesce(title, "Untitled"),  "slug": slug.current,  excerpt,  coverImage,  "date": coalesce(date, _updatedAt),  "author": author->{firstName, lastName, picture},  }
-export type PostQueryResult = {
-  content: Array<
-    | {
-        children?: Array<{
-          marks?: Array<string>
-          text?: string
-          _type: 'span'
-          _key: string
-        }>
-        style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
-        listItem?: 'bullet' | 'number'
-        markDefs: Array<{
-          linkType?: 'href' | 'page' | 'post'
-          href?: string
-          page: string | null
-          post: string | null
-          openInNewTab?: boolean
-          _type: 'link'
-          _key: string
-        }> | null
-        level?: number
-        _type: 'block'
-        _key: string
-      }
-    | {
-        asset?: SanityImageAssetReference
-        media?: unknown
-        hotspot?: SanityImageHotspot
-        crop?: SanityImageCrop
-        _type: 'image'
-        _key: string
-        markDefs: null
-      }
-  > | null
-  _id: string
-  status: 'draft' | 'published'
-  title: string
-  slug: string
-  excerpt: string | null
-  coverImage: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  } | null
-  date: string
-  author: {
-    firstName: string
-    lastName: string
-    picture: {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      alt?: string
-      _type: 'image'
-    }
-  } | null
-} | null
-
-// Source: sanity/lib/queries.ts
-// Variable: postPagesSlugs
-// Query: *[_type == "post" && defined(slug.current)]  {"slug": slug.current}
-export type PostPagesSlugsResult = Array<{
-  slug: string
+  _type: 'page'
+  _updatedAt: string
 }>
 
 // Source: sanity/lib/queries.ts
@@ -812,17 +1056,533 @@ export type PagesSlugsResult = Array<{
   slug: string
 }>
 
+// Source: sanity/lib/queries.ts
+// Variable: headerQuery
+// Query: *[_type == "header" && (!defined($locale) || language == $locale)][0]{    _id, _type, language, logoText,    logoImage{ _type, asset, crop, hotspot },    navLinks[]{ _key, title, href }  }
+export type HeaderQueryResult = {
+  _id: string
+  _type: 'header'
+  language: 'en-GB' | 'en-US' | 'fr-FR' | null
+  logoText: string
+  logoImage: {
+    _type: 'image'
+    asset: SanityImageAssetReference | null
+    crop: SanityImageCrop | null
+    hotspot: SanityImageHotspot | null
+  } | null
+  navLinks: Array<{
+    _key: string
+    title: string
+    href: string
+  }> | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: footerQuery
+// Query: *[_type == "footer" && (!defined($locale) || language == $locale)][0]{    _id, _type, language,    footerLinks[]{ _key, title, href },    footerText  }
+export type FooterQueryResult = {
+  _id: string
+  _type: 'footer'
+  language: 'en-GB' | 'en-US' | 'fr-FR' | null
+  footerLinks: Array<{
+    _key: string
+    title: string
+    href: string
+  }> | null
+  footerText: string | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: productsQuery
+// Query: *[_type == "product"] | order(name asc){    _id, _type, name, modelNumber, slug,    images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },    features,    links[]{ _key, label, url }  }
+export type ProductsQueryResult = Array<{
+  _id: string
+  _type: 'product'
+  name: string | null
+  modelNumber: string | null
+  slug: string | null
+  images: Array<{
+    _key: string
+    _type: 'image'
+    asset: SanityImageAssetReference | null
+    imageUrl: string | null
+    assetUrl: string | null
+    alt: string | null
+  }>
+  features: Array<string> | null
+  links: Array<{
+    _key: string
+    label: string | null
+    url: string | null
+  }> | null
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: productBySlugQuery
+// Query: *[_type == "product" && slug == $slug][0]{      _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description }  }
+export type ProductBySlugQueryResult = {
+  _id: string
+  name: string | null
+  modelNumber: string | null
+  slug: string | null
+  imageUrls: Array<string | null>
+  images: Array<{
+    _key: string
+    _type: 'image'
+    asset: SanityImageAssetReference | null
+    imageUrl: string | null
+    assetUrl: string | null
+    alt: string | null
+  }>
+  features: Array<string> | null
+  links: Array<{
+    label?: string
+    url?: string
+    _key: string
+  }> | null
+  versions: {
+    versionName: string | null
+    description: string | null
+  } | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: productPageBySlugQuery
+// Query: *[_type == "productPage" && slug.current == $slug][0]{    _id, _type, title, slug,    "products": products[]{      _key, isDefault,      "product": product->{   _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description } }    },    "defaultProduct": products[isDefault == true][0].product->{   _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description } },      components[] {    _key, _type,    ...@-> {      ...select(          _type == "highlightsHero" => {    _id, _type, title, description, modelNumber,    bgDesktopImage{ _type, asset, "url": asset->url, alt },    bgMobileImage{ _type, asset, "url": asset->url, alt }  },          _type == "iconOverview" => {    _id, _type, title,    "icons": icons[]->{      _id, _type, title,      "iconImageUrl": iconImage.asset->url,      "iconImageAlt": iconImage.alt    }  },          _type == "contentImageBlock" => {    _id, _type, title, description,    image{ _type, asset, "url": asset->url, alt },    imagePosition  },          _type == "featureOverviewBlock" => {    _id, _type, title,    columns[]{      _key, title, description,      image{ _type, asset, "url": asset->url, alt },      icon{ _type, asset, "url": asset->url, alt }    }  },          _type == "legacyMigration" => {    _id, _type, title,    "externalAssets": externalAssets,    bodyHtml, legacyClassName  }      )    }  },    metaTitle, metaDescription  }
+export type ProductPageBySlugQueryResult = {
+  _id: string
+  _type: 'productPage'
+  title: string
+  slug: Slug | null
+  products: Array<{
+    _key: string
+    isDefault: boolean | null
+    product: {
+      _id: string
+      name: string | null
+      modelNumber: string | null
+      slug: string | null
+      imageUrls: Array<string | null>
+      images: Array<{
+        _key: string
+        _type: 'image'
+        asset: SanityImageAssetReference | null
+        imageUrl: string | null
+        assetUrl: string | null
+        alt: string | null
+      }>
+      features: Array<string> | null
+      links: Array<{
+        label?: string
+        url?: string
+        _key: string
+      }> | null
+      versions: {
+        versionName: string | null
+        description: string | null
+      } | null
+    }
+  }>
+  defaultProduct: {
+    _id: string
+    name: string | null
+    modelNumber: string | null
+    slug: string | null
+    imageUrls: Array<string | null>
+    images: Array<{
+      _key: string
+      _type: 'image'
+      asset: SanityImageAssetReference | null
+      imageUrl: string | null
+      assetUrl: string | null
+      alt: string | null
+    }>
+    features: Array<string> | null
+    links: Array<{
+      label?: string
+      url?: string
+      _key: string
+    }> | null
+    versions: {
+      versionName: string | null
+      description: string | null
+    } | null
+  } | null
+  components: Array<
+    | {
+        _key: string
+        _type: 'contentImageBlock'
+        _id: string
+        title: string
+        description: Array<{
+          children?: Array<{
+            marks?: Array<string>
+            text?: string
+            _type: 'span'
+            _key: string
+          }>
+          style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+          listItem?: 'bullet' | 'number'
+          markDefs?: Array<{
+            href?: string
+            _type: 'link'
+            _key: string
+          }>
+          level?: number
+          _type: 'block'
+          _key: string
+        }> | null
+        image: {
+          _type: 'image'
+          asset: SanityImageAssetReference | null
+          url: string | null
+          alt: string | null
+        }
+        imagePosition: 'left' | 'right' | null
+      }
+    | {
+        _key: string
+        _type: 'featureOverviewBlock'
+        _id: string
+        title: string
+        columns: Array<{
+          _key: string
+          title: string
+          description: string | null
+          image: {
+            _type: 'image'
+            asset: SanityImageAssetReference | null
+            url: string | null
+            alt: string | null
+          }
+          icon: {
+            _type: 'image'
+            asset: SanityImageAssetReference | null
+            url: string | null
+            alt: string | null
+          } | null
+        }> | null
+      }
+    | {
+        _key: string
+        _type: 'highlightsHero'
+        _id: string
+        title: string | null
+        description: string | null
+        modelNumber: string | null
+        bgDesktopImage: {
+          _type: 'image'
+          asset: SanityImageAssetReference | null
+          url: string | null
+          alt: string | null
+        }
+        bgMobileImage: {
+          _type: 'image'
+          asset: SanityImageAssetReference | null
+          url: string | null
+          alt: string | null
+        }
+      }
+    | {
+        _key: string
+        _type: 'iconOverview'
+        _id: string
+        title: string | null
+        icons: Array<{
+          _id: string
+          _type: 'icon'
+          title: string | null
+          iconImageUrl: string | null
+          iconImageAlt: string | null
+        }> | null
+      }
+    | {
+        _key: string
+        _type: 'legacyMigration'
+        _id: string
+        title: string
+        externalAssets: Array<string> | null
+        bodyHtml: string
+        legacyClassName: string | null
+      }
+  > | null
+  metaTitle: string | null
+  metaDescription: string | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: localizedProductPageQuery
+// Query: *[_type == "productPage" && language == $locale && slug.current == $model][0]{    _id, _type, title, slug,    "products": products[]{      _key, isDefault,      "product": product->{   _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description } }    },    "defaultProduct": products[isDefault == true][0].product->{   _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description } },      components[] {    _key, _type,    ...@-> {      ...select(          _type == "highlightsHero" => {    _id, _type, title, description, modelNumber,    bgDesktopImage{ _type, asset, "url": asset->url, alt },    bgMobileImage{ _type, asset, "url": asset->url, alt }  },          _type == "iconOverview" => {    _id, _type, title,    "icons": icons[]->{      _id, _type, title,      "iconImageUrl": iconImage.asset->url,      "iconImageAlt": iconImage.alt    }  },          _type == "contentImageBlock" => {    _id, _type, title, description,    image{ _type, asset, "url": asset->url, alt },    imagePosition  },          _type == "featureOverviewBlock" => {    _id, _type, title,    columns[]{      _key, title, description,      image{ _type, asset, "url": asset->url, alt },      icon{ _type, asset, "url": asset->url, alt }    }  },          _type == "legacyMigration" => {    _id, _type, title,    "externalAssets": externalAssets,    bodyHtml, legacyClassName  }      )    }  },    metaTitle, metaDescription  }
+export type LocalizedProductPageQueryResult = {
+  _id: string
+  _type: 'productPage'
+  title: string
+  slug: Slug | null
+  products: Array<{
+    _key: string
+    isDefault: boolean | null
+    product: {
+      _id: string
+      name: string | null
+      modelNumber: string | null
+      slug: string | null
+      imageUrls: Array<string | null>
+      images: Array<{
+        _key: string
+        _type: 'image'
+        asset: SanityImageAssetReference | null
+        imageUrl: string | null
+        assetUrl: string | null
+        alt: string | null
+      }>
+      features: Array<string> | null
+      links: Array<{
+        label?: string
+        url?: string
+        _key: string
+      }> | null
+      versions: {
+        versionName: string | null
+        description: string | null
+      } | null
+    }
+  }>
+  defaultProduct: {
+    _id: string
+    name: string | null
+    modelNumber: string | null
+    slug: string | null
+    imageUrls: Array<string | null>
+    images: Array<{
+      _key: string
+      _type: 'image'
+      asset: SanityImageAssetReference | null
+      imageUrl: string | null
+      assetUrl: string | null
+      alt: string | null
+    }>
+    features: Array<string> | null
+    links: Array<{
+      label?: string
+      url?: string
+      _key: string
+    }> | null
+    versions: {
+      versionName: string | null
+      description: string | null
+    } | null
+  } | null
+  components: Array<
+    | {
+        _key: string
+        _type: 'contentImageBlock'
+        _id: string
+        title: string
+        description: Array<{
+          children?: Array<{
+            marks?: Array<string>
+            text?: string
+            _type: 'span'
+            _key: string
+          }>
+          style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+          listItem?: 'bullet' | 'number'
+          markDefs?: Array<{
+            href?: string
+            _type: 'link'
+            _key: string
+          }>
+          level?: number
+          _type: 'block'
+          _key: string
+        }> | null
+        image: {
+          _type: 'image'
+          asset: SanityImageAssetReference | null
+          url: string | null
+          alt: string | null
+        }
+        imagePosition: 'left' | 'right' | null
+      }
+    | {
+        _key: string
+        _type: 'featureOverviewBlock'
+        _id: string
+        title: string
+        columns: Array<{
+          _key: string
+          title: string
+          description: string | null
+          image: {
+            _type: 'image'
+            asset: SanityImageAssetReference | null
+            url: string | null
+            alt: string | null
+          }
+          icon: {
+            _type: 'image'
+            asset: SanityImageAssetReference | null
+            url: string | null
+            alt: string | null
+          } | null
+        }> | null
+      }
+    | {
+        _key: string
+        _type: 'highlightsHero'
+        _id: string
+        title: string | null
+        description: string | null
+        modelNumber: string | null
+        bgDesktopImage: {
+          _type: 'image'
+          asset: SanityImageAssetReference | null
+          url: string | null
+          alt: string | null
+        }
+        bgMobileImage: {
+          _type: 'image'
+          asset: SanityImageAssetReference | null
+          url: string | null
+          alt: string | null
+        }
+      }
+    | {
+        _key: string
+        _type: 'iconOverview'
+        _id: string
+        title: string | null
+        icons: Array<{
+          _id: string
+          _type: 'icon'
+          title: string | null
+          iconImageUrl: string | null
+          iconImageAlt: string | null
+        }> | null
+      }
+    | {
+        _key: string
+        _type: 'legacyMigration'
+        _id: string
+        title: string
+        externalAssets: Array<string> | null
+        bodyHtml: string
+        legacyClassName: string | null
+      }
+  > | null
+  metaTitle: string | null
+  metaDescription: string | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: localizedProductsByCollectionQuery
+// Query: *[_type == "product" && language == $locale && collection->slug.current == $collection] | order(name asc){    _id, name, modelNumber, slug,    "collectionSlug": collection->slug.current,    images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt }  }
+export type LocalizedProductsByCollectionQueryResult = Array<{
+  _id: string
+  name: string | null
+  modelNumber: string | null
+  slug: string | null
+  collectionSlug: string
+  images: Array<{
+    _key: string
+    _type: 'image'
+    asset: SanityImageAssetReference | null
+    imageUrl: string | null
+    assetUrl: string | null
+    alt: string | null
+  }>
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: collectionsByLocaleQuery
+// Query: *[_type == "collection" && language == $locale] | order(title asc){    _id, _type, title, "slug": slug.current, language,    image{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },    description  }
+export type CollectionsByLocaleQueryResult = Array<{
+  _id: string
+  _type: 'collection'
+  title: string
+  slug: string
+  language: 'en-GB' | 'en-US' | 'fr-FR' | null
+  image: {
+    _key: null
+    _type: 'image'
+    asset: SanityImageAssetReference | null
+    imageUrl: string | null
+    assetUrl: string | null
+    alt: string | null
+  } | null
+  description: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+    listItem?: 'bullet' | 'number'
+    markDefs?: Array<{
+      href?: string
+      _type: 'link'
+      _key: string
+    }>
+    level?: number
+    _type: 'block'
+    _key: string
+  }> | null
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: collectionBySlugQuery
+// Query: *[_type == "collection" && language == $locale && slug.current == $collectionSlug][0]{    _id, _type, title, "slug": slug.current, language,    image{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },    description  }
+export type CollectionBySlugQueryResult = {
+  _id: string
+  _type: 'collection'
+  title: string
+  slug: string
+  language: 'en-GB' | 'en-US' | 'fr-FR' | null
+  image: {
+    _key: null
+    _type: 'image'
+    asset: SanityImageAssetReference | null
+    imageUrl: string | null
+    assetUrl: string | null
+    alt: string | null
+  } | null
+  description: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+    listItem?: 'bullet' | 'number'
+    markDefs?: Array<{
+      href?: string
+      _type: 'link'
+      _key: string
+    }>
+    level?: number
+    _type: 'block'
+    _key: string
+  }> | null
+} | null
+
 // Query TypeMap
 import '@sanity/client'
 declare module '@sanity/client' {
   interface SanityQueries {
     '*[_type == "settings"][0]': SettingsQueryResult
-    '\n  *[_type == \'page\' && slug.current == $slug][0]{\n    _id,\n    _type,\n    name,\n    slug,\n    heading,\n    subheading,\n    "pageBuilder": pageBuilder[]{\n      ...,\n      _type == "callToAction" => {\n        ...,\n        button {\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n        }\n      },\n      _type == "infoSection" => {\n        content[]{\n          ...,\n          markDefs[]{\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n    },\n  }\n': GetPageQueryResult
-    '\n  *[_type == "page" || _type == "post" && defined(slug.current)] | order(_type asc) {\n    "slug": slug.current,\n    _type,\n    _updatedAt,\n  }\n': SitemapDataResult
-    '\n  *[_type == "post" && defined(slug.current)] | order(date desc, _updatedAt desc) {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "author": author->{firstName, lastName, picture},\n\n  }\n': AllPostsQueryResult
-    '\n  *[_type == "post" && _id != $skip && defined(slug.current)] | order(date desc, _updatedAt desc) [0...$limit] {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "author": author->{firstName, lastName, picture},\n\n  }\n': MorePostsQueryResult
-    '\n  *[_type == "post" && slug.current == $slug] [0] {\n    content[]{\n    ...,\n    markDefs[]{\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n    }\n  },\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "author": author->{firstName, lastName, picture},\n\n  }\n': PostQueryResult
-    '\n  *[_type == "post" && defined(slug.current)]\n  {"slug": slug.current}\n': PostPagesSlugsResult
+    '\n  *[_type == \'page\' && slug.current == $slug][0]{\n    _id,\n    _type,\n    name,\n    slug,\n    heading,\n    subheading,\n    "pageBuilder": pageBuilder[]{\n      ...,\n      _type == "callToAction" => {\n        ...,\n        button {\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n  }\n\n      }\n\n        }\n      },\n      _type == "infoSection" => {\n        content[]{\n          ...,\n          markDefs[]{\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n  }\n\n          }\n        }\n      },\n    },\n  }\n': GetPageQueryResult
+    '\n  *[_type == "page" && defined(slug.current)] | order(_type asc) {\n    "slug": slug.current,\n    _type,\n    _updatedAt,\n  }\n': SitemapDataResult
     '\n  *[_type == "page" && defined(slug.current)]\n  {"slug": slug.current}\n': PagesSlugsResult
+    '\n  *[_type == "header" && (!defined($locale) || language == $locale)][0]{\n    _id, _type, language, logoText,\n    logoImage{ _type, asset, crop, hotspot },\n    navLinks[]{ _key, title, href }\n  }\n': HeaderQueryResult
+    '\n  *[_type == "footer" && (!defined($locale) || language == $locale)][0]{\n    _id, _type, language,\n    footerLinks[]{ _key, title, href },\n    footerText\n  }\n': FooterQueryResult
+    '\n  *[_type == "product"] | order(name asc){\n    _id, _type, name, modelNumber, slug,\n    images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n    features,\n    links[]{ _key, label, url }\n  }\n': ProductsQueryResult
+    '\n  *[_type == "product" && slug == $slug][0]{\n    \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description }\n\n  }\n': ProductBySlugQueryResult
+    '\n  *[_type == "productPage" && slug.current == $slug][0]{\n    _id, _type, title, slug,\n    "products": products[]{\n      _key, isDefault,\n      "product": product->{ \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description }\n }\n    },\n    "defaultProduct": products[isDefault == true][0].product->{ \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description }\n },\n    \n  components[] {\n    _key, _type,\n    ...@-> {\n      ...select(\n        \n  _type == "highlightsHero" => {\n    _id, _type, title, description, modelNumber,\n    bgDesktopImage{ _type, asset, "url": asset->url, alt },\n    bgMobileImage{ _type, asset, "url": asset->url, alt }\n  }\n,\n        \n  _type == "iconOverview" => {\n    _id, _type, title,\n    "icons": icons[]->{\n      _id, _type, title,\n      "iconImageUrl": iconImage.asset->url,\n      "iconImageAlt": iconImage.alt\n    }\n  }\n,\n        \n  _type == "contentImageBlock" => {\n    _id, _type, title, description,\n    image{ _type, asset, "url": asset->url, alt },\n    imagePosition\n  }\n,\n        \n  _type == "featureOverviewBlock" => {\n    _id, _type, title,\n    columns[]{\n      _key, title, description,\n      image{ _type, asset, "url": asset->url, alt },\n      icon{ _type, asset, "url": asset->url, alt }\n    }\n  }\n,\n        \n  _type == "legacyMigration" => {\n    _id, _type, title,\n    "externalAssets": externalAssets,\n    bodyHtml, legacyClassName\n  }\n\n      )\n    }\n  }\n,\n    metaTitle, metaDescription\n  }\n': ProductPageBySlugQueryResult
+    '\n  *[_type == "productPage" && language == $locale && slug.current == $model][0]{\n    _id, _type, title, slug,\n    "products": products[]{\n      _key, isDefault,\n      "product": product->{ \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description }\n }\n    },\n    "defaultProduct": products[isDefault == true][0].product->{ \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description }\n },\n    \n  components[] {\n    _key, _type,\n    ...@-> {\n      ...select(\n        \n  _type == "highlightsHero" => {\n    _id, _type, title, description, modelNumber,\n    bgDesktopImage{ _type, asset, "url": asset->url, alt },\n    bgMobileImage{ _type, asset, "url": asset->url, alt }\n  }\n,\n        \n  _type == "iconOverview" => {\n    _id, _type, title,\n    "icons": icons[]->{\n      _id, _type, title,\n      "iconImageUrl": iconImage.asset->url,\n      "iconImageAlt": iconImage.alt\n    }\n  }\n,\n        \n  _type == "contentImageBlock" => {\n    _id, _type, title, description,\n    image{ _type, asset, "url": asset->url, alt },\n    imagePosition\n  }\n,\n        \n  _type == "featureOverviewBlock" => {\n    _id, _type, title,\n    columns[]{\n      _key, title, description,\n      image{ _type, asset, "url": asset->url, alt },\n      icon{ _type, asset, "url": asset->url, alt }\n    }\n  }\n,\n        \n  _type == "legacyMigration" => {\n    _id, _type, title,\n    "externalAssets": externalAssets,\n    bodyHtml, legacyClassName\n  }\n\n      )\n    }\n  }\n,\n    metaTitle, metaDescription\n  }\n': LocalizedProductPageQueryResult
+    '\n  *[_type == "product" && language == $locale && collection->slug.current == $collection] | order(name asc){\n    _id, name, modelNumber, slug,\n    "collectionSlug": collection->slug.current,\n    images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n }\n  }\n': LocalizedProductsByCollectionQueryResult
+    '\n  *[_type == "collection" && language == $locale] | order(title asc){\n    _id, _type, title, "slug": slug.current, language,\n    image{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n    description\n  }\n': CollectionsByLocaleQueryResult
+    '\n  *[_type == "collection" && language == $locale && slug.current == $collectionSlug][0]{\n    _id, _type, title, "slug": slug.current, language,\n    image{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n    description\n  }\n': CollectionBySlugQueryResult
   }
 }

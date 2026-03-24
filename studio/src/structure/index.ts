@@ -1,29 +1,171 @@
-import {CogIcon} from '@sanity/icons'
+import {
+  CogIcon,
+  DocumentIcon,
+  DocumentsIcon,
+  FolderIcon,
+  LinkIcon,
+  PackageIcon,
+  UsersIcon,
+} from '@sanity/icons'
+import React, {type ComponentType} from 'react'
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
-import pluralize from 'pluralize-esm'
+import {LOCALES} from 'shared'
 
-/**
- * Structure builder is useful whenever you want to control how documents are grouped and
- * listed in the studio or for adding additional in-studio previews or content to documents.
- * Learn more: https://www.sanity.io/docs/structure-builder-introduction
- */
+function flagEmojiFromLocale(locale: string): string {
+  const country = locale.split('-').pop()?.toUpperCase() ?? ''
+  if (country.length !== 2) return '🏳️'
+  return String.fromCodePoint(...country.split('').map((c) => 0x1f1e6 + c.charCodeAt(0) - 65))
+}
 
-const DISABLED_TYPES = ['settings', 'assist.instruction.context']
+function createFlagIcon(locale: string): ComponentType<{style?: React.CSSProperties}> {
+  const flag = flagEmojiFromLocale(locale)
+  return function FlagIcon(props) {
+    return React.createElement(
+      'span',
+      {
+        role: 'img',
+        'aria-label': `Flag for ${locale}`,
+        style: {fontSize: '1em', lineHeight: 1, ...props?.style},
+      },
+      flag,
+    )
+  }
+}
+
+const COMPONENT_TYPES = [
+  'highlightsHero',
+  'icon',
+  'iconOverview',
+  'contentImageBlock',
+  'featureOverviewBlock',
+  'legacyMigration',
+] as const
+
+const COMPONENT_TITLES: Record<string, string> = {
+  highlightsHero: 'Highlights Heroes',
+  icon: 'Icons',
+  iconOverview: 'Icon Overviews',
+  contentImageBlock: 'Content Image Blocks',
+  featureOverviewBlock: 'Feature Overview Blocks',
+  legacyMigration: 'Legacy Migrations',
+}
+
+function localeGroupedList(
+  S: StructureBuilder,
+  schemaType: string,
+  label: string,
+  apiVersion: string,
+) {
+  return S.list()
+    .title(label)
+    .items([
+      S.listItem()
+        .title(`All ${label}`)
+        .id(`${schemaType}-all`)
+        .child(S.documentTypeList(schemaType).title(`All ${label}`)),
+      ...LOCALES.map(({value, title}) =>
+        S.listItem()
+          .title(title)
+          .id(`${schemaType}-${value}`)
+          .icon(createFlagIcon(value))
+          .child(
+            S.documentList()
+              .id(`${schemaType}-${value}-list`)
+              .title(`${label} — ${title}`)
+              .schemaType(schemaType)
+              .apiVersion(`v${apiVersion}`)
+              .filter(`_type == "${schemaType}" && language == $locale`)
+              .params({locale: value}),
+          ),
+      ),
+    ])
+}
+
+const apiVersion = '2026-02-27'
 
 export const structure: StructureResolver = (S: StructureBuilder) =>
   S.list()
-    .title('Website Content')
+    .title('Content')
     .items([
-      ...S.documentTypeListItems()
-        // Remove the "assist.instruction.context" and "settings" content  from the list of content types
-        .filter((listItem: any) => !DISABLED_TYPES.includes(listItem.getId()))
-        // Pluralize the title of each document type.  This is not required but just an option to consider.
-        .map((listItem) => {
-          return listItem.title(pluralize(listItem.getTitle() as string))
-        }),
-      // Settings Singleton in order to view/edit the one particular document for Settings.  Learn more about Singletons: https://www.sanity.io/docs/create-a-link-to-a-single-edit-page-in-your-main-document-type-list
+      // ── Website ──────────────────────────────────────────
+      S.divider().title('Website'),
+
       S.listItem()
-        .title('Site Settings')
-        .child(S.document().schemaType('settings').documentId('siteSettings'))
-        .icon(CogIcon),
+        .title('Pages')
+        .icon(DocumentsIcon)
+        .child(
+          S.list()
+            .title('Pages')
+            .items([
+              S.listItem()
+                .title('Product Pages')
+                .icon(DocumentsIcon)
+                .child(localeGroupedList(S, 'productPage', 'Product Pages', apiVersion)),
+              S.listItem()
+                .title('Landing Pages')
+                .icon(DocumentIcon)
+                .child(S.documentTypeList('page').title('Landing Pages')),
+            ]),
+        ),
+
+      S.listItem()
+        .title('Site Config')
+        .icon(CogIcon)
+        .child(
+          S.list()
+            .title('Site Config')
+            .items([
+              S.listItem()
+                .title('Settings')
+                .icon(CogIcon)
+                .child(S.document().schemaType('settings').documentId('siteSettings')),
+              S.listItem()
+                .title('Header')
+                .icon(LinkIcon)
+                .child(localeGroupedList(S, 'header', 'Headers', apiVersion)),
+              S.listItem()
+                .title('Footer')
+                .icon(DocumentIcon)
+                .child(localeGroupedList(S, 'footer', 'Footers', apiVersion)),
+            ]),
+        ),
+
+      S.listItem()
+        .title('Components')
+        .icon(CogIcon)
+        .child(
+          S.list()
+            .title('Components')
+            .items(
+              S.documentTypeListItems()
+                .filter((item) =>
+                  COMPONENT_TYPES.includes(item.getId() as (typeof COMPONENT_TYPES)[number]),
+                )
+                .map((item) => {
+                  const title = COMPONENT_TITLES[item.getId() ?? '']
+                  return title ? item.title(title) : item
+                }),
+            ),
+        ),
+
+      // ── Merchandising ────────────────────────────────────
+      S.divider().title('Merchandising'),
+
+      S.listItem()
+        .title('Collections')
+        .icon(FolderIcon)
+        .child(localeGroupedList(S, 'collection', 'Collections', apiVersion)),
+
+      S.listItem()
+        .title('Products')
+        .icon(PackageIcon)
+        .child(localeGroupedList(S, 'product', 'Products', apiVersion)),
+
+      // ── Tapo ─────────────────────────────────────────────
+      S.divider().title('Tapo'),
+
+      S.listItem()
+        .title('People')
+        .icon(UsersIcon)
+        .child(S.documentTypeList('person').title('People')),
     ])

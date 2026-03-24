@@ -13,6 +13,41 @@
  */
 
 // Source: ../sanity.schema.json
+export type SanityImageAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+}
+
+export type FeatureColumn = {
+  _type: 'featureColumn'
+  image: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  icon?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  title: string
+  description?: string
+}
+
+export type NavLink = {
+  _type: 'navLink'
+  title: string
+  href: string
+}
+
 export type PageReference = {
   _ref: string
   _type: 'reference'
@@ -20,27 +55,12 @@ export type PageReference = {
   [internalGroqTypeReferenceTo]?: 'page'
 }
 
-export type PostReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'post'
-}
-
 export type Link = {
   _type: 'link'
-  linkType?: 'href' | 'page' | 'post'
+  linkType?: 'href' | 'page'
   href?: string
   page?: PageReference
-  post?: PostReference
   openInNewTab?: boolean
-}
-
-export type SanityImageAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
 }
 
 export type CallToAction = {
@@ -97,10 +117,9 @@ export type BlockContent = Array<
       style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
       listItem?: 'bullet' | 'number'
       markDefs?: Array<{
-        linkType?: 'href' | 'page' | 'post'
+        linkType?: 'href' | 'page'
         href?: string
         page?: PageReference
-        post?: PostReference
         openInNewTab?: boolean
         _type: 'link'
         _key: string
@@ -125,44 +144,30 @@ export type Button = {
   link?: Link
 }
 
-export type Settings = {
+export type LegacyMigration = {
   _id: string
-  _type: 'settings'
+  _type: 'legacyMigration'
   _createdAt: string
   _updatedAt: string
   _rev: string
   title: string
-  description?: Array<{
-    children?: Array<{
-      marks?: Array<string>
-      text?: string
-      _type: 'span'
+  externalAssets?: Array<string>
+  bodyHtml: string
+  legacyClassName?: string
+}
+
+export type FeatureOverviewBlock = {
+  _id: string
+  _type: 'featureOverviewBlock'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  columns?: Array<
+    {
       _key: string
-    }>
-    style?: 'normal'
-    listItem?: never
-    markDefs?: Array<{
-      linkType?: 'href' | 'page' | 'post'
-      href?: string
-      page?: PageReference
-      post?: PostReference
-      openInNewTab?: boolean
-      _type: 'link'
-      _key: string
-    }>
-    level?: number
-    _type: 'block'
-    _key: string
-  }>
-  ogImage?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    metadataBase?: string
-    _type: 'image'
-  }
+    } & FeatureColumn
+  >
 }
 
 export type SanityImageCrop = {
@@ -181,44 +186,32 @@ export type SanityImageHotspot = {
   width: number
 }
 
-export type Page = {
+export type ContentImageBlock = {
   _id: string
-  _type: 'page'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  name: string
-  slug: Slug
-  heading: string
-  subheading?: string
-  pageBuilder?: Array<
-    | ({
-        _key: string
-      } & CallToAction)
-    | ({
-        _key: string
-      } & InfoSection)
-  >
-}
-
-export type PersonReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'person'
-}
-
-export type Post = {
-  _id: string
-  _type: 'post'
+  _type: 'contentImageBlock'
   _createdAt: string
   _updatedAt: string
   _rev: string
   title: string
-  slug: Slug
-  content?: BlockContent
-  excerpt?: string
-  coverImage?: {
+  description?: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
+    listItem?: 'bullet' | 'number'
+    markDefs?: Array<{
+      href?: string
+      _type: 'link'
+      _key: string
+    }>
+    level?: number
+    _type: 'block'
+    _key: string
+  }>
+  image: {
     asset?: SanityImageAssetReference
     media?: unknown
     hotspot?: SanityImageHotspot
@@ -226,8 +219,193 @@ export type Post = {
     alt?: string
     _type: 'image'
   }
-  date?: string
-  author?: PersonReference
+  imagePosition?: 'right' | 'left'
+}
+
+export type IconReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'icon'
+}
+
+export type IconOverview = {
+  _id: string
+  _type: 'iconOverview'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  icons?: Array<
+    {
+      _key: string
+    } & IconReference
+  >
+}
+
+export type Icon = {
+  _id: string
+  _type: 'icon'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  iconImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+}
+
+export type HighlightsHero = {
+  _id: string
+  _type: 'highlightsHero'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  description?: string
+  modelNumber?: string
+  bgDesktopImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  bgMobileImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+}
+
+export type Footer = {
+  _id: string
+  _type: 'footer'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  footerLinks?: Array<
+    {
+      _key: string
+    } & NavLink
+  >
+  footerText?: string
+}
+
+export type Header = {
+  _id: string
+  _type: 'header'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  logoText: string
+  logoImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  navLinks?: Array<
+    {
+      _key: string
+    } & NavLink
+  >
+}
+
+export type ProductReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'product'
+}
+
+export type HighlightsHeroReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'highlightsHero'
+}
+
+export type IconOverviewReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'iconOverview'
+}
+
+export type ContentImageBlockReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'contentImageBlock'
+}
+
+export type FeatureOverviewBlockReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'featureOverviewBlock'
+}
+
+export type LegacyMigrationReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'legacyMigration'
+}
+
+export type ProductPage = {
+  _id: string
+  _type: 'productPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  title: string
+  slug?: Slug
+  products: Array<{
+    product: ProductReference
+    isDefault?: boolean
+    _type: 'productEntry'
+    _key: string
+  }>
+  components?: Array<
+    | ({
+        _key: string
+      } & HighlightsHeroReference)
+    | ({
+        _key: string
+      } & IconOverviewReference)
+    | ({
+        _key: string
+      } & ContentImageBlockReference)
+    | ({
+        _key: string
+      } & FeatureOverviewBlockReference)
+    | ({
+        _key: string
+      } & LegacyMigrationReference)
+  >
+  metaTitle?: string
+  metaDescription?: string
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
 }
 
 export type Person = {
@@ -248,10 +426,73 @@ export type Person = {
   }
 }
 
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
+export type Settings = {
+  _id: string
+  _type: 'settings'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  description?: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal'
+    listItem?: never
+    markDefs?: Array<{
+      linkType?: 'href' | 'page'
+      href?: string
+      page?: PageReference
+      openInNewTab?: boolean
+      _type: 'link'
+      _key: string
+    }>
+    level?: number
+    _type: 'block'
+    _key: string
+  }>
+  primaryBrandColor?: Color
+  ogImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    metadataBase?: string
+    _type: 'image'
+  }
+}
+
+export type Color = {
+  _type: 'color'
+  hex?: string
+  alpha?: number
+  hsl?: HslaColor
+  hsv?: HsvaColor
+  rgb?: RgbaColor
+}
+
+export type Page = {
+  _id: string
+  _type: 'page'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  slug: Slug
+  heading: string
+  subheading?: string
+  pageBuilder?: Array<
+    | ({
+        _key: string
+      } & CallToAction)
+    | ({
+        _key: string
+      } & InfoSection)
+  >
 }
 
 export type SanityAssistInstructionTask = {
@@ -391,6 +632,129 @@ export type SanityAssistSchemaTypeField = {
   >
 }
 
+export type TranslationMetadata = {
+  _id: string
+  _type: 'translation.metadata'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  translations?: InternationalizedArrayReference
+  schemaTypes?: Array<string>
+}
+
+export type InternationalizedArrayReference = Array<
+  {
+    _key: string
+  } & InternationalizedArrayReferenceValue
+>
+
+export type CollectionReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'collection'
+}
+
+export type InternationalizedArrayReferenceValue = {
+  _type: 'internationalizedArrayReferenceValue'
+  value?: ProductReference | CollectionReference
+  language: string
+}
+
+export type Product = {
+  _id: string
+  _type: 'product'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name?: string
+  modelNumber?: string
+  productId: number
+  slug?: string
+  collection: CollectionReference
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  images: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+    _key: string
+  }>
+  features?: Array<string>
+  links?: Array<{
+    label?: string
+    url?: string
+    _key: string
+  }>
+  versions?: {
+    versionName?: string
+    description?: string
+  }
+}
+
+export type Collection = {
+  _id: string
+  _type: 'collection'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  description?: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
+    listItem?: 'bullet' | 'number'
+    markDefs?: Array<{
+      href?: string
+      _type: 'link'
+      _key: string
+    }>
+    level?: number
+    _type: 'block'
+    _key: string
+  }>
+}
+
+export type RgbaColor = {
+  _type: 'rgbaColor'
+  r?: number
+  g?: number
+  b?: number
+  a?: number
+}
+
+export type HsvaColor = {
+  _type: 'hsvaColor'
+  h?: number
+  s?: number
+  v?: number
+  a?: number
+}
+
+export type HslaColor = {
+  _type: 'hslaColor'
+  h?: number
+  s?: number
+  l?: number
+  a?: number
+}
+
 export type SanityImagePaletteSwatch = {
   _type: 'sanity.imagePaletteSwatch'
   background?: string
@@ -488,23 +852,39 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
-  | PageReference
-  | PostReference
-  | Link
   | SanityImageAssetReference
+  | FeatureColumn
+  | NavLink
+  | PageReference
+  | Link
   | CallToAction
   | InfoSection
   | BlockContentTextOnly
   | BlockContent
   | Button
-  | Settings
+  | LegacyMigration
+  | FeatureOverviewBlock
   | SanityImageCrop
   | SanityImageHotspot
-  | Page
-  | PersonReference
-  | Post
-  | Person
+  | ContentImageBlock
+  | IconReference
+  | IconOverview
+  | Icon
+  | HighlightsHero
+  | Footer
+  | Header
+  | ProductReference
+  | HighlightsHeroReference
+  | IconOverviewReference
+  | ContentImageBlockReference
+  | FeatureOverviewBlockReference
+  | LegacyMigrationReference
+  | ProductPage
   | Slug
+  | Person
+  | Settings
+  | Color
+  | Page
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus
   | SanityAssistSchemaTypeAnnotations
@@ -518,6 +898,15 @@ export type AllSanitySchemaTypes =
   | SanityAssistInstructionFieldRef
   | SanityAssistInstruction
   | SanityAssistSchemaTypeField
+  | TranslationMetadata
+  | InternationalizedArrayReference
+  | CollectionReference
+  | InternationalizedArrayReferenceValue
+  | Product
+  | Collection
+  | RgbaColor
+  | HsvaColor
+  | HslaColor
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
