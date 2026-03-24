@@ -10,7 +10,7 @@ export const header = defineType({
       name: 'language',
       title: 'Language',
       type: 'string',
-      options: {list: [...LOCALES]},
+      options: {list: LOCALES},
     }),
     defineField({
       name: 'logoText',

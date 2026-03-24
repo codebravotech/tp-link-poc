@@ -2,7 +2,7 @@ export const LOCALES = [
   {value: 'en-US' as const, title: 'English (US)'},
   {value: 'en-GB' as const, title: 'English (UK)'},
   {value: 'fr-FR' as const, title: 'Français (FR)'},
-] as const
+]
 
 export type Locale = (typeof LOCALES)[number]['value']
 

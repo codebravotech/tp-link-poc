@@ -1,12 +1,16 @@
 import {
+  BlockElementIcon,
   CogIcon,
-  DocumentIcon,
-  DocumentsIcon,
-  FolderIcon,
-  LinkIcon,
+  ComposeIcon,
   PackageIcon,
   UsersIcon,
+  HomeIcon,
+  DesktopIcon,
+  InsertAboveIcon,
+  InsertBelowIcon,
+  StackIcon,
 } from '@sanity/icons'
+import {AddDocumentIcon} from '@sanity/icons'
 import React, {type ComponentType} from 'react'
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
 import {LOCALES} from 'shared'
@@ -23,9 +27,9 @@ function createFlagIcon(locale: string): ComponentType<{style?: React.CSSPropert
     return React.createElement(
       'span',
       {
-        role: 'img',
+        'role': 'img',
         'aria-label': `Flag for ${locale}`,
-        style: {fontSize: '1em', lineHeight: 1, ...props?.style},
+        'style': {fontSize: '1em', lineHeight: 1, ...props?.style},
       },
       flag,
     )
@@ -55,13 +59,16 @@ function localeGroupedList(
   schemaType: string,
   label: string,
   apiVersion: string,
+  icon: ComponentType<{style?: React.CSSProperties}>,
 ) {
   return S.list()
     .title(label)
+
     .items([
       S.listItem()
         .title(`All ${label}`)
         .id(`${schemaType}-all`)
+        .icon(icon)
         .child(S.documentTypeList(schemaType).title(`All ${label}`)),
       ...LOCALES.map(({value, title}) =>
         S.listItem()
@@ -75,7 +82,23 @@ function localeGroupedList(
               .schemaType(schemaType)
               .apiVersion(`v${apiVersion}`)
               .filter(`_type == "${schemaType}" && language == $locale`)
-              .params({locale: value}),
+              .params({locale: value})
+              .initialValueTemplates([
+                S.initialValueTemplateItem(`${schemaType}-${value}`),
+              ])
+              .menuItems([
+                S.menuItem()
+                  .title(`Create new (${title})`)
+                  .icon(AddDocumentIcon)
+                  .intent({
+                    type: 'create',
+                    params: {type: schemaType, template: `${schemaType}-${value}`},
+                  }),
+              ])
+              .canHandleIntent(
+                (intentName, params) =>
+                  intentName === 'create' && params.template === `${schemaType}-${value}`,
+              ),
           ),
       ),
     ])
@@ -92,19 +115,44 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
 
       S.listItem()
         .title('Pages')
-        .icon(DocumentsIcon)
+        .icon(DesktopIcon)
         .child(
           S.list()
             .title('Pages')
             .items([
               S.listItem()
+                .title('Home Page')
+                .icon(HomeIcon)
+                .child(
+                  S.list()
+                    .title('Home Page')
+                    .items(
+                      LOCALES.map(({value, title}) =>
+                        S.listItem()
+                          .title(title)
+                          .id(`homePage-${value}`)
+                          .icon(createFlagIcon(value))
+                          .child(
+                            S.document()
+                              .schemaType('page')
+                              .documentId(`homePage-${value}`)
+                              .initialValueTemplate(`page-${value}`),
+                          ),
+                      ),
+                    ),
+                ),
+              S.listItem()
                 .title('Product Pages')
-                .icon(DocumentsIcon)
-                .child(localeGroupedList(S, 'productPage', 'Product Pages', apiVersion)),
+                .icon(PackageIcon)
+                .child(
+                  localeGroupedList(S, 'productPage', 'Product Pages', apiVersion, PackageIcon),
+                ),
               S.listItem()
                 .title('Landing Pages')
-                .icon(DocumentIcon)
-                .child(S.documentTypeList('page').title('Landing Pages')),
+                .icon(ComposeIcon)
+                .child(
+                  localeGroupedList(S, 'page', 'Landing Pages', apiVersion, ComposeIcon),
+                ),
             ]),
         ),
 
@@ -121,18 +169,18 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
                 .child(S.document().schemaType('settings').documentId('siteSettings')),
               S.listItem()
                 .title('Header')
-                .icon(LinkIcon)
-                .child(localeGroupedList(S, 'header', 'Headers', apiVersion)),
+                .icon(InsertBelowIcon)
+                .child(localeGroupedList(S, 'header', 'Headers', apiVersion, InsertBelowIcon)),
               S.listItem()
                 .title('Footer')
-                .icon(DocumentIcon)
-                .child(localeGroupedList(S, 'footer', 'Footers', apiVersion)),
+                .icon(InsertAboveIcon)
+                .child(localeGroupedList(S, 'footer', 'Footers', apiVersion, InsertAboveIcon)),
             ]),
         ),
 
       S.listItem()
         .title('Components')
-        .icon(CogIcon)
+        .icon(BlockElementIcon)
         .child(
           S.list()
             .title('Components')
@@ -153,13 +201,13 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
 
       S.listItem()
         .title('Collections')
-        .icon(FolderIcon)
-        .child(localeGroupedList(S, 'collection', 'Collections', apiVersion)),
+        .icon(StackIcon)
+        .child(localeGroupedList(S, 'collection', 'Collections', apiVersion, StackIcon)),
 
       S.listItem()
         .title('Products')
         .icon(PackageIcon)
-        .child(localeGroupedList(S, 'product', 'Products', apiVersion)),
+        .child(localeGroupedList(S, 'product', 'Products', apiVersion, PackageIcon)),
 
       // ── Tapo ─────────────────────────────────────────────
       S.divider().title('Tapo'),

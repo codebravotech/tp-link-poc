@@ -35,6 +35,13 @@ export const product = defineType({
       readOnly: adminOnlyReadOnly,
     }),
     defineField({
+      name: 'language',
+      title: 'Language',
+      type: 'string',
+      options: {list: LOCALES},
+      readOnly: adminOnlyReadOnly,
+    }),
+    defineField({
       name: 'collection',
       title: 'Collection',
       type: 'reference',
@@ -42,13 +49,7 @@ export const product = defineType({
       validation: (Rule) => Rule.required(),
       readOnly: adminOnlyReadOnly,
     }),
-    defineField({
-      name: 'language',
-      title: 'Language',
-      type: 'string',
-      options: {list: [...LOCALES]},
-      readOnly: adminOnlyReadOnly,
-    }),
+
     defineField({
       name: 'images',
       title: 'Product Images',

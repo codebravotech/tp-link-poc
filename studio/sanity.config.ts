@@ -13,10 +13,10 @@ import {
   type DocumentLocation,
 } from 'sanity/presentation'
 import {assist} from '@sanity/assist'
-import {SUPPORTED_LANGUAGES, isValidLocale} from 'shared'
+import {DEFAULT_LOCALE, isValidLocale, SUPPORTED_LANGUAGES} from 'shared'
 
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'your-projectID'
-const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'wh4ayjq9'
+const dataset = process.env.SANITY_STUDIO_DATASET || 'internationalization'
 const SANITY_STUDIO_PREVIEW_URL = process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:3000'
 
 const homeLocation = {
@@ -24,12 +24,12 @@ const homeLocation = {
   href: '/',
 } satisfies DocumentLocation
 
-function resolveHref(documentType?: string, slug?: string): string | undefined {
+function resolveHref(documentType: string, locale: string, slug?: string): string | undefined {
   switch (documentType) {
     case 'page':
-      return slug ? `/${slug}` : undefined
+      return slug ? `/${locale}/${slug}` : `${locale}/`
     case 'productPage':
-      return slug ? `/products/${slug}` : undefined
+      return slug ? `/${locale}/products/${slug}` : undefined
     default:
       return undefined
   }
@@ -51,69 +51,66 @@ export default defineConfig({
         },
       },
       resolve: {
-        // mainDocuments: defineDocuments([
-        //   {
-        //     route: '/',
-        //     filter: `_type == "settings" && _id == "siteSettings"`,
-        //   },
-        //   {
-        //     route: '/:slug',
-        //     filter: `_type == "page" && slug.current == $slug || _id == $slug`,
-        //   },
-        //   {
-        //     route: '/products/:slug',
-        //     filter: `_type == "productPage" && slug.current == $slug`,
-        //   },
-        //   {
-        //     route: '/:locale/products/:collection',
-        //     resolve(ctx) {
-        //       const locale = ctx.params.locale
-        //       if (!locale || !isValidLocale(locale)) return undefined
-        //       return {
-        //         filter: `_type == "collection" && language == $locale && slug.current == $collection`,
-        //         params: {locale, collection: ctx.params.collection},
-        //       }
-        //     },
-        //   },
-        //   {
-        //     route: '/:locale/products/:collection/:model',
-        //     resolve(ctx) {
-        //       const locale = ctx.params.locale
-        //       if (!locale || !isValidLocale(locale)) return undefined
-        //       return {
-        //         filter: `_type == "productPage" && language == $locale && slug.current == $model`,
-        //         params: {locale, collection: ctx.params.collection, model: ctx.params.model},
-        //       }
-        //     },
-        //   },
-        // ]),
+        mainDocuments: defineDocuments([
+          {
+            route: '/:locale/:slug',
+            filter: `_type == "page" && language == $locale && slug.current == $slug || _id == $slug`,
+          },
+          {
+            route: '/:locale/products/:slug',
+            filter: `_type == "productPage" && language == $locale && slug.current == $slug`,
+          },
+          {
+            route: '/:locale/products/:collection',
+            resolve(ctx) {
+              const locale = ctx.params.locale
+              if (!locale || !isValidLocale(locale)) return undefined
+              return {
+                filter: `_type == "collection" && language == $locale && slug.current == $collection`,
+                params: {locale, collection: ctx.params.collection},
+              }
+            },
+          },
+          {
+            route: '/:locale/products/:collection/:model',
+            resolve(ctx) {
+              const locale = ctx.params.locale
+              if (!locale || !isValidLocale(locale)) return undefined
+              return {
+                filter: `_type == "productPage" && language == $locale && slug.current == $model`,
+                params: {locale, collection: ctx.params.collection, model: ctx.params.model},
+              }
+            },
+          },
+        ]),
         locations: {
-          settings: defineLocations({
-            locations: [homeLocation],
-            message: 'This document is used on all pages',
-            tone: 'positive',
-          }),
           page: defineLocations({
-            select: {name: 'name', slug: 'slug.current'},
-            resolve: (doc) => ({
-              locations: [
-                {
-                  title: doc?.name || 'Untitled',
-                  href: resolveHref('page', doc?.slug)!,
-                },
-              ],
-            }),
+            select: {name: 'name', slug: 'slug.current', locale: 'language'},
+            resolve: (doc) => {
+              const href = resolveHref('page', doc?.locale || DEFAULT_LOCALE, doc?.slug)!
+              return {
+                locations: [
+                  {
+                    title: doc?.name || 'Untitled',
+                    href,
+                  },
+                ],
+              }
+            },
           }),
           productPage: defineLocations({
-            select: {title: 'title', slug: 'slug.current'},
-            resolve: (doc) => ({
-              locations: [
-                {
-                  title: doc?.title || 'Untitled',
-                  href: resolveHref('productPage', doc?.slug)!,
-                },
-              ],
-            }),
+            select: {title: 'title', slug: 'slug.current', locale: 'language'},
+            resolve: (doc) => {
+              const href = resolveHref('productPage', doc?.locale || DEFAULT_LOCALE, doc?.slug)!
+              return {
+                locations: [
+                  {
+                    title: doc?.title || 'Untitled',
+                    href,
+                  },
+                ],
+              }
+            },
           }),
         },
       },
@@ -122,7 +119,7 @@ export default defineConfig({
     colorInput(),
     documentInternationalization({
       supportedLanguages: [...SUPPORTED_LANGUAGES],
-      schemaTypes: ['product', 'collection', 'productPage', 'page', 'header', 'footer'],
+      schemaTypes: ['collection', 'footer', 'header', 'page', 'product', 'productPage'],
       languageField: 'language',
     }),
     unsplashImageAsset(),
@@ -130,7 +127,7 @@ export default defineConfig({
       translate: {
         document: {
           languageField: 'language',
-          documentTypes: ['productPage', 'product', 'header', 'footer', 'page'],
+          documentTypes: ['footer', 'header', 'page', 'product', 'productPage'],
         },
       },
     }),
@@ -139,5 +136,6 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
+    templates: (prev) => prev.filter((t) => t.id !== t.schemaType),
   },
 })

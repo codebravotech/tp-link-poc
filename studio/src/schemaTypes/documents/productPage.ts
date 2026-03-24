@@ -11,13 +11,6 @@ export const productPage = defineType({
   ],
   fields: [
     defineField({
-      name: 'language',
-      title: 'Language',
-      type: 'string',
-      group: 'content',
-      options: {list: [...LOCALES]},
-    }),
-    defineField({
       name: 'title',
       title: 'Page Title',
       type: 'string',
@@ -30,6 +23,13 @@ export const productPage = defineType({
       type: 'slug',
       group: 'content',
       options: {source: 'title', maxLength: 96},
+    }),
+    defineField({
+      name: 'language',
+      title: 'Language',
+      type: 'string',
+      group: 'content',
+      options: {list: LOCALES},
     }),
     defineField({
       name: 'products',

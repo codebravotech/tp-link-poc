@@ -287,127 +287,6 @@ export type HighlightsHero = {
   }
 }
 
-export type Footer = {
-  _id: string
-  _type: 'footer'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
-  footerLinks?: Array<
-    {
-      _key: string
-    } & NavLink
-  >
-  footerText?: string
-}
-
-export type Header = {
-  _id: string
-  _type: 'header'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
-  logoText: string
-  logoImage?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    _type: 'image'
-  }
-  navLinks?: Array<
-    {
-      _key: string
-    } & NavLink
-  >
-}
-
-export type ProductReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'product'
-}
-
-export type HighlightsHeroReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'highlightsHero'
-}
-
-export type IconOverviewReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'iconOverview'
-}
-
-export type ContentImageBlockReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'contentImageBlock'
-}
-
-export type FeatureOverviewBlockReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'featureOverviewBlock'
-}
-
-export type LegacyMigrationReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'legacyMigration'
-}
-
-export type ProductPage = {
-  _id: string
-  _type: 'productPage'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
-  title: string
-  slug?: Slug
-  products: Array<{
-    product: ProductReference
-    isDefault?: boolean
-    _type: 'productEntry'
-    _key: string
-  }>
-  components?: Array<
-    | ({
-        _key: string
-      } & HighlightsHeroReference)
-    | ({
-        _key: string
-      } & IconOverviewReference)
-    | ({
-        _key: string
-      } & ContentImageBlockReference)
-    | ({
-        _key: string
-      } & FeatureOverviewBlockReference)
-    | ({
-        _key: string
-      } & LegacyMigrationReference)
-  >
-  metaTitle?: string
-  metaDescription?: string
-}
-
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
-}
-
 export type Person = {
   _id: string
   _type: 'person'
@@ -473,26 +352,6 @@ export type Color = {
   hsl?: HslaColor
   hsv?: HsvaColor
   rgb?: RgbaColor
-}
-
-export type Page = {
-  _id: string
-  _type: 'page'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  name: string
-  slug: Slug
-  heading: string
-  subheading?: string
-  pageBuilder?: Array<
-    | ({
-        _key: string
-      } & CallToAction)
-    | ({
-        _key: string
-      } & InfoSection)
-  >
 }
 
 export type SanityAssistInstructionTask = {
@@ -655,10 +514,121 @@ export type CollectionReference = {
   [internalGroqTypeReferenceTo]?: 'collection'
 }
 
+export type FooterReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'footer'
+}
+
+export type HeaderReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'header'
+}
+
+export type ProductReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'product'
+}
+
+export type ProductPageReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'productPage'
+}
+
 export type InternationalizedArrayReferenceValue = {
   _type: 'internationalizedArrayReferenceValue'
-  value?: ProductReference | CollectionReference
+  value?:
+    | CollectionReference
+    | FooterReference
+    | HeaderReference
+    | PageReference
+    | ProductReference
+    | ProductPageReference
   language: string
+}
+
+export type HighlightsHeroReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'highlightsHero'
+}
+
+export type IconOverviewReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'iconOverview'
+}
+
+export type ContentImageBlockReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'contentImageBlock'
+}
+
+export type FeatureOverviewBlockReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'featureOverviewBlock'
+}
+
+export type LegacyMigrationReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'legacyMigration'
+}
+
+export type ProductPage = {
+  _id: string
+  _type: 'productPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug?: Slug
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  products: Array<{
+    product: ProductReference
+    isDefault?: boolean
+    _type: 'productEntry'
+    _key: string
+  }>
+  components?: Array<
+    | ({
+        _key: string
+      } & HighlightsHeroReference)
+    | ({
+        _key: string
+      } & IconOverviewReference)
+    | ({
+        _key: string
+      } & ContentImageBlockReference)
+    | ({
+        _key: string
+      } & FeatureOverviewBlockReference)
+    | ({
+        _key: string
+      } & LegacyMigrationReference)
+  >
+  metaTitle?: string
+  metaDescription?: string
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
 }
 
 export type Product = {
@@ -671,8 +641,8 @@ export type Product = {
   modelNumber?: string
   productId: number
   slug?: string
-  collection: CollectionReference
   language?: 'en-US' | 'en-GB' | 'fr-FR'
+  collection: CollectionReference
   images: Array<{
     asset?: SanityImageAssetReference
     media?: unknown
@@ -692,6 +662,64 @@ export type Product = {
     versionName?: string
     description?: string
   }
+}
+
+export type Page = {
+  _id: string
+  _type: 'page'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  slug?: Slug
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  heading: string
+  subheading?: string
+  pageBuilder?: Array<
+    | ({
+        _key: string
+      } & CallToAction)
+    | ({
+        _key: string
+      } & InfoSection)
+  >
+}
+
+export type Header = {
+  _id: string
+  _type: 'header'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  logoText: string
+  logoImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  navLinks?: Array<
+    {
+      _key: string
+    } & NavLink
+  >
+}
+
+export type Footer = {
+  _id: string
+  _type: 'footer'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  footerLinks?: Array<
+    {
+      _key: string
+    } & NavLink
+  >
+  footerText?: string
 }
 
 export type Collection = {
@@ -871,20 +899,9 @@ export type AllSanitySchemaTypes =
   | IconOverview
   | Icon
   | HighlightsHero
-  | Footer
-  | Header
-  | ProductReference
-  | HighlightsHeroReference
-  | IconOverviewReference
-  | ContentImageBlockReference
-  | FeatureOverviewBlockReference
-  | LegacyMigrationReference
-  | ProductPage
-  | Slug
   | Person
   | Settings
   | Color
-  | Page
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus
   | SanityAssistSchemaTypeAnnotations
@@ -901,8 +918,22 @@ export type AllSanitySchemaTypes =
   | TranslationMetadata
   | InternationalizedArrayReference
   | CollectionReference
+  | FooterReference
+  | HeaderReference
+  | ProductReference
+  | ProductPageReference
   | InternationalizedArrayReferenceValue
+  | HighlightsHeroReference
+  | IconOverviewReference
+  | ContentImageBlockReference
+  | FeatureOverviewBlockReference
+  | LegacyMigrationReference
+  | ProductPage
+  | Slug
   | Product
+  | Page
+  | Header
+  | Footer
   | Collection
   | RgbaColor
   | HsvaColor

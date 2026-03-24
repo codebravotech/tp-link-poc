@@ -1,5 +1,6 @@
 import {defineField, defineType} from 'sanity'
 import {DocumentIcon} from '@sanity/icons'
+import {LOCALES} from 'shared'
 
 /**
  * Page schema.  Define and edit the fields for the 'page' content type.
@@ -23,11 +24,22 @@ export const page = defineType({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      validation: (Rule) => Rule.required(),
+      hidden: ({document}) => document?._id?.includes('homePage') ?? false,
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          if (context.document?._id?.includes('homePage')) return true
+          return value ? true : 'Slug is required'
+        }),
       options: {
         source: 'name',
         maxLength: 96,
       },
+    }),
+    defineField({
+      name: 'language',
+      title: 'Language',
+      type: 'string',
+      options: {list: LOCALES},
     }),
     defineField({
       name: 'heading',
@@ -42,7 +54,7 @@ export const page = defineType({
     }),
     defineField({
       name: 'pageBuilder',
-      title: 'Page builder',
+      title: 'Page Builder',
       type: 'array',
       of: [{type: 'callToAction'}, {type: 'infoSection'}],
       options: {
