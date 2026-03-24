@@ -3468,32 +3468,18 @@
         },
         "optional": false
       },
+      "language": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "slug": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
           "name": "slug"
-        },
-        "optional": true
-      },
-      "language": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "en-US"
-            },
-            {
-              "type": "string",
-              "value": "en-GB"
-            },
-            {
-              "type": "string",
-              "value": "fr-FR"
-            }
-          ]
         },
         "optional": true
       },
@@ -3731,6 +3717,13 @@
         },
         "optional": false
       },
+      "language": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "slug": {
         "type": "objectAttribute",
         "value": {
@@ -3738,32 +3731,25 @@
         },
         "optional": true
       },
-      "language": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "en-US"
-            },
-            {
-              "type": "string",
-              "value": "en-GB"
-            },
-            {
-              "type": "string",
-              "value": "fr-FR"
-            }
-          ]
-        },
-        "optional": true
-      },
       "collection": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "collection.reference"
+          "type": "array",
+          "of": {
+            "type": "object",
+            "attributes": {
+              "_key": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                }
+              }
+            },
+            "rest": {
+              "type": "inline",
+              "name": "collection.reference"
+            }
+          }
         },
         "optional": false
       },
@@ -3900,6 +3886,14 @@
                 "type": "string"
               },
               "optional": true
+            },
+            "versionSlug": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "inline",
+                "name": "slug"
+              },
+              "optional": true
             }
           }
         },
@@ -3947,34 +3941,20 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
+      },
+      "language": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
       },
       "slug": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
           "name": "slug"
-        },
-        "optional": true
-      },
-      "language": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "en-US"
-            },
-            {
-              "type": "string",
-              "value": "en-GB"
-            },
-            {
-              "type": "string",
-              "value": "fr-FR"
-            }
-          ]
         },
         "optional": true
       },
@@ -4074,21 +4054,7 @@
       "language": {
         "type": "objectAttribute",
         "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "en-US"
-            },
-            {
-              "type": "string",
-              "value": "en-GB"
-            },
-            {
-              "type": "string",
-              "value": "fr-FR"
-            }
-          ]
+          "type": "string"
         },
         "optional": true
       },
@@ -4208,21 +4174,7 @@
       "language": {
         "type": "objectAttribute",
         "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "en-US"
-            },
-            {
-              "type": "string",
-              "value": "en-GB"
-            },
-            {
-              "type": "string",
-              "value": "fr-FR"
-            }
-          ]
+          "type": "string"
         },
         "optional": true
       },
@@ -4299,6 +4251,13 @@
         },
         "optional": false
       },
+      "language": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "slug": {
         "type": "objectAttribute",
         "value": {
@@ -4306,27 +4265,6 @@
           "name": "slug"
         },
         "optional": false
-      },
-      "language": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "en-US"
-            },
-            {
-              "type": "string",
-              "value": "en-GB"
-            },
-            {
-              "type": "string",
-              "value": "fr-FR"
-            }
-          ]
-        },
-        "optional": true
       },
       "image": {
         "type": "objectAttribute",

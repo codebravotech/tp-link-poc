@@ -46,6 +46,12 @@ export const link = defineType({
       title: 'Page',
       type: 'reference',
       to: [{type: 'page'}],
+      options: {
+        filter: ({document}) => ({
+          filter: 'language == $language',
+          params: {language: document.language},
+        }),
+      },
       hidden: ({parent}) => parent?.linkType !== 'page',
       validation: (Rule) =>
         Rule.custom((value, context) => {

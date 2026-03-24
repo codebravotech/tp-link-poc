@@ -598,8 +598,8 @@ export type ProductPage = {
   _updatedAt: string
   _rev: string
   title: string
+  language?: string
   slug?: Slug
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
   products: Array<{
     product: ProductReference
     isDefault?: boolean
@@ -642,9 +642,13 @@ export type Product = {
   name?: string
   modelNumber?: string
   productId: number
+  language?: string
   slug?: string
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
-  collection: CollectionReference
+  collection: Array<
+    {
+      _key: string
+    } & CollectionReference
+  >
   images: Array<{
     asset?: SanityImageAssetReference
     media?: unknown
@@ -663,6 +667,7 @@ export type Product = {
   versions?: {
     versionName?: string
     description?: string
+    versionSlug?: Slug
   }
 }
 
@@ -672,9 +677,9 @@ export type Page = {
   _createdAt: string
   _updatedAt: string
   _rev: string
-  name: string
+  name?: string
+  language?: string
   slug?: Slug
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
   heading: string
   subheading?: string
   pageBuilder?: Array<
@@ -693,7 +698,7 @@ export type Header = {
   _createdAt: string
   _updatedAt: string
   _rev: string
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  language?: string
   logoText: string
   logoImage?: {
     asset?: SanityImageAssetReference
@@ -715,7 +720,7 @@ export type Footer = {
   _createdAt: string
   _updatedAt: string
   _rev: string
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  language?: string
   footerLinks?: Array<
     {
       _key: string
@@ -731,8 +736,8 @@ export type Collection = {
   _updatedAt: string
   _rev: string
   title: string
+  language?: string
   slug: Slug
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
   image?: {
     asset?: SanityImageAssetReference
     media?: unknown

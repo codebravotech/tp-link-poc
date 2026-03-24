@@ -136,7 +136,7 @@ const productProjection = /* groq */ `
   "imageUrls": images[].asset->url,
   images[]{ ${imageUrlFragment} },
   features, links,
-  versions{ versionName, description }
+  versions{ versionName, description, "versionSlug": versionSlug.current }
 `
 
 export const headerQuery = defineQuery(`
@@ -170,22 +170,9 @@ export const productBySlugQuery = defineQuery(`
   }
 `)
 
-export const productPageBySlugQuery = defineQuery(`
-  *[_type == "productPage" && slug.current == $slug][0]{
-    _id, _type, title, slug,
-    "products": products[]{
-      _key, isDefault,
-      "product": product->{ ${productProjection} }
-    },
-    "defaultProduct": products[isDefault == true][0].product->{ ${productProjection} },
-    ${productComponentsProjection},
-    metaTitle, metaDescription
-  }
-`)
-
 export const localizedProductPageQuery = defineQuery(`
-  *[_type == "productPage" && language == $locale && slug.current == $model][0]{
-    _id, _type, title, slug,
+  *[_type == "productPage" && language == $locale && slug.current == $slug][0]{
+    _id, _type, title, slug, language,
     "products": products[]{
       _key, isDefault,
       "product": product->{ ${productProjection} }
@@ -197,9 +184,9 @@ export const localizedProductPageQuery = defineQuery(`
 `)
 
 export const localizedProductsByCollectionQuery = defineQuery(`
-  *[_type == "product" && language == $locale && collection->slug.current == $collection] | order(name asc){
+  *[_type == "product" && language == $locale && $collectionSlug in collection[]->slug.current] | order(name asc){
     _id, name, modelNumber, slug,
-    "collectionSlug": collection->slug.current,
+    "collectionSlugs": collection[]->slug.current,
     images[]{ ${imageUrlFragment} }
   }
 `)

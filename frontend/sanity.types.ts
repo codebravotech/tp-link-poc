@@ -598,8 +598,8 @@ export type ProductPage = {
   _updatedAt: string
   _rev: string
   title: string
+  language?: string
   slug?: Slug
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
   products: Array<{
     product: ProductReference
     isDefault?: boolean
@@ -642,9 +642,13 @@ export type Product = {
   name?: string
   modelNumber?: string
   productId: number
+  language?: string
   slug?: string
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
-  collection: CollectionReference
+  collection: Array<
+    {
+      _key: string
+    } & CollectionReference
+  >
   images: Array<{
     asset?: SanityImageAssetReference
     media?: unknown
@@ -663,6 +667,7 @@ export type Product = {
   versions?: {
     versionName?: string
     description?: string
+    versionSlug?: Slug
   }
 }
 
@@ -672,9 +677,9 @@ export type Page = {
   _createdAt: string
   _updatedAt: string
   _rev: string
-  name: string
+  name?: string
+  language?: string
   slug?: Slug
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
   heading: string
   subheading?: string
   pageBuilder?: Array<
@@ -693,7 +698,7 @@ export type Header = {
   _createdAt: string
   _updatedAt: string
   _rev: string
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  language?: string
   logoText: string
   logoImage?: {
     asset?: SanityImageAssetReference
@@ -715,7 +720,7 @@ export type Footer = {
   _createdAt: string
   _updatedAt: string
   _rev: string
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
+  language?: string
   footerLinks?: Array<
     {
       _key: string
@@ -731,8 +736,8 @@ export type Collection = {
   _updatedAt: string
   _rev: string
   title: string
+  language?: string
   slug: Slug
-  language?: 'en-US' | 'en-GB' | 'fr-FR'
   image?: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -995,11 +1000,11 @@ export type SettingsQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: getPageQuery
-// Query: *[_type == 'page' && slug.current == $slug][0]{    _id,    _type,    name,    slug,    heading,    subheading,    "pageBuilder": pageBuilder[]{      ...,      _type == "callToAction" => {        ...,        button {          ...,            link {      ...,        _type == "link" => {    "page": page->slug.current,  }      }        }      },      _type == "infoSection" => {        content[]{          ...,          markDefs[]{            ...,              _type == "link" => {    "page": page->slug.current,  }          }        }      },    },  }
+// Query: *[_type == 'page' && slug.current == $slug && language == $locale][0]{    _id,    _type,    name,    slug,    heading,    subheading,    "pageBuilder": pageBuilder[]{      ...,      _type == "callToAction" => {        ...,        button {          ...,            link {      ...,        _type == "link" => {    "page": page->slug.current,  }      }        }      },      _type == "infoSection" => {        content[]{          ...,          markDefs[]{            ...,              _type == "link" => {    "page": page->slug.current,  }          }        }      },    },  }
 export type GetPageQueryResult = {
   _id: string
   _type: 'page'
-  name: string
+  name: string | null
   slug: Slug | null
   heading: string
   subheading: string | null
@@ -1074,12 +1079,27 @@ export type GetPageQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: sitemapData
-// Query: *[_type == "page" && defined(slug.current)] | order(_type asc) {    "slug": slug.current,    _type,    _updatedAt,  }
-export type SitemapDataResult = Array<{
-  slug: string
-  _type: 'page'
-  _updatedAt: string
-}>
+// Query: *[_type in ["page", "productPage", "collection"] && defined(slug.current)] | order(_type asc) {    "slug": slug.current,    _type,    _updatedAt,    "language": language,  }
+export type SitemapDataResult = Array<
+  | {
+      slug: string
+      _type: 'collection'
+      _updatedAt: string
+      language: string | null
+    }
+  | {
+      slug: string | null
+      _type: 'page'
+      _updatedAt: string
+      language: string | null
+    }
+  | {
+      slug: string | null
+      _type: 'productPage'
+      _updatedAt: string
+      language: string | null
+    }
+>
 
 // Source: sanity/lib/queries.ts
 // Variable: pagesSlugs
@@ -1094,7 +1114,7 @@ export type PagesSlugsResult = Array<{
 export type HeaderQueryResult = {
   _id: string
   _type: 'header'
-  language: 'en-GB' | 'en-US' | 'fr-FR' | null
+  language: string | null
   logoText: string
   logoImage: {
     _type: 'image'
@@ -1115,7 +1135,7 @@ export type HeaderQueryResult = {
 export type FooterQueryResult = {
   _id: string
   _type: 'footer'
-  language: 'en-GB' | 'en-US' | 'fr-FR' | null
+  language: string | null
   footerLinks: Array<{
     _key: string
     title: string
@@ -1151,7 +1171,7 @@ export type ProductsQueryResult = Array<{
 
 // Source: sanity/lib/queries.ts
 // Variable: productBySlugQuery
-// Query: *[_type == "product" && slug == $slug][0]{      _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description }  }
+// Query: *[_type == "product" && slug == $slug][0]{      _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description, "versionSlug": versionSlug.current }  }
 export type ProductBySlugQueryResult = {
   _id: string
   name: string | null
@@ -1175,12 +1195,13 @@ export type ProductBySlugQueryResult = {
   versions: {
     versionName: string | null
     description: string | null
+    versionSlug: string | null
   } | null
 } | null
 
 // Source: sanity/lib/queries.ts
 // Variable: productPageBySlugQuery
-// Query: *[_type == "productPage" && slug.current == $slug][0]{    _id, _type, title, slug,    "products": products[]{      _key, isDefault,      "product": product->{   _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description } }    },    "defaultProduct": products[isDefault == true][0].product->{   _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description } },      components[] {    _key, _type,    ...@-> {      ...select(          _type == "highlightsHero" => {    _id, _type, title, description, modelNumber,    bgDesktopImage{ _type, asset, "url": asset->url, alt },    bgMobileImage{ _type, asset, "url": asset->url, alt }  },          _type == "iconOverview" => {    _id, _type, title,    "icons": icons[]->{      _id, _type, title,      "iconImageUrl": iconImage.asset->url,      "iconImageAlt": iconImage.alt    }  },          _type == "contentImageBlock" => {    _id, _type, title, description,    image{ _type, asset, "url": asset->url, alt },    imagePosition  },          _type == "featureOverviewBlock" => {    _id, _type, title,    columns[]{      _key, title, description,      image{ _type, asset, "url": asset->url, alt },      icon{ _type, asset, "url": asset->url, alt }    }  },          _type == "legacyMigration" => {    _id, _type, title,    "externalAssets": externalAssets,    bodyHtml, legacyClassName  }      )    }  },    metaTitle, metaDescription  }
+// Query: *[_type == "productPage" && slug.current == $slug][0]{    _id, _type, title, slug,    "products": products[]{      _key, isDefault,      "product": product->{   _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description, "versionSlug": versionSlug.current } }    },    "defaultProduct": products[isDefault == true][0].product->{   _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description, "versionSlug": versionSlug.current } },      components[] {    _key, _type,    ...@-> {      ...select(          _type == "highlightsHero" => {    _id, _type, title, description, modelNumber,    bgDesktopImage{ _type, asset, "url": asset->url, alt },    bgMobileImage{ _type, asset, "url": asset->url, alt }  },          _type == "iconOverview" => {    _id, _type, title,    "icons": icons[]->{      _id, _type, title,      "iconImageUrl": iconImage.asset->url,      "iconImageAlt": iconImage.alt    }  },          _type == "contentImageBlock" => {    _id, _type, title, description,    image{ _type, asset, "url": asset->url, alt },    imagePosition  },          _type == "featureOverviewBlock" => {    _id, _type, title,    columns[]{      _key, title, description,      image{ _type, asset, "url": asset->url, alt },      icon{ _type, asset, "url": asset->url, alt }    }  },          _type == "legacyMigration" => {    _id, _type, title,    "externalAssets": externalAssets,    bodyHtml, legacyClassName  }      )    }  },    metaTitle, metaDescription  }
 export type ProductPageBySlugQueryResult = {
   _id: string
   _type: 'productPage'
@@ -1212,6 +1233,7 @@ export type ProductPageBySlugQueryResult = {
       versions: {
         versionName: string | null
         description: string | null
+        versionSlug: string | null
       } | null
     }
   }>
@@ -1238,6 +1260,7 @@ export type ProductPageBySlugQueryResult = {
     versions: {
       versionName: string | null
       description: string | null
+      versionSlug: string | null
     } | null
   } | null
   components: Array<
@@ -1344,7 +1367,7 @@ export type ProductPageBySlugQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: localizedProductPageQuery
-// Query: *[_type == "productPage" && language == $locale && slug.current == $model][0]{    _id, _type, title, slug,    "products": products[]{      _key, isDefault,      "product": product->{   _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description } }    },    "defaultProduct": products[isDefault == true][0].product->{   _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description } },      components[] {    _key, _type,    ...@-> {      ...select(          _type == "highlightsHero" => {    _id, _type, title, description, modelNumber,    bgDesktopImage{ _type, asset, "url": asset->url, alt },    bgMobileImage{ _type, asset, "url": asset->url, alt }  },          _type == "iconOverview" => {    _id, _type, title,    "icons": icons[]->{      _id, _type, title,      "iconImageUrl": iconImage.asset->url,      "iconImageAlt": iconImage.alt    }  },          _type == "contentImageBlock" => {    _id, _type, title, description,    image{ _type, asset, "url": asset->url, alt },    imagePosition  },          _type == "featureOverviewBlock" => {    _id, _type, title,    columns[]{      _key, title, description,      image{ _type, asset, "url": asset->url, alt },      icon{ _type, asset, "url": asset->url, alt }    }  },          _type == "legacyMigration" => {    _id, _type, title,    "externalAssets": externalAssets,    bodyHtml, legacyClassName  }      )    }  },    metaTitle, metaDescription  }
+// Query: *[_type == "productPage" && language == $locale && slug.current == $slug][0]{    _id, _type, title, slug,    "products": products[]{      _key, isDefault,      "product": product->{   _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description, "versionSlug": versionSlug.current } }    },    "defaultProduct": products[isDefault == true][0].product->{   _id, name, modelNumber, slug,  "imageUrls": images[].asset->url,  images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt },  features, links,  versions{ versionName, description, "versionSlug": versionSlug.current } },      components[] {    _key, _type,    ...@-> {      ...select(          _type == "highlightsHero" => {    _id, _type, title, description, modelNumber,    bgDesktopImage{ _type, asset, "url": asset->url, alt },    bgMobileImage{ _type, asset, "url": asset->url, alt }  },          _type == "iconOverview" => {    _id, _type, title,    "icons": icons[]->{      _id, _type, title,      "iconImageUrl": iconImage.asset->url,      "iconImageAlt": iconImage.alt    }  },          _type == "contentImageBlock" => {    _id, _type, title, description,    image{ _type, asset, "url": asset->url, alt },    imagePosition  },          _type == "featureOverviewBlock" => {    _id, _type, title,    columns[]{      _key, title, description,      image{ _type, asset, "url": asset->url, alt },      icon{ _type, asset, "url": asset->url, alt }    }  },          _type == "legacyMigration" => {    _id, _type, title,    "externalAssets": externalAssets,    bodyHtml, legacyClassName  }      )    }  },    metaTitle, metaDescription  }
 export type LocalizedProductPageQueryResult = {
   _id: string
   _type: 'productPage'
@@ -1376,6 +1399,7 @@ export type LocalizedProductPageQueryResult = {
       versions: {
         versionName: string | null
         description: string | null
+        versionSlug: string | null
       } | null
     }
   }>
@@ -1402,6 +1426,7 @@ export type LocalizedProductPageQueryResult = {
     versions: {
       versionName: string | null
       description: string | null
+      versionSlug: string | null
     } | null
   } | null
   components: Array<
@@ -1508,13 +1533,13 @@ export type LocalizedProductPageQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: localizedProductsByCollectionQuery
-// Query: *[_type == "product" && language == $locale && collection->slug.current == $collection] | order(name asc){    _id, name, modelNumber, slug,    "collectionSlug": collection->slug.current,    images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt }  }
+// Query: *[_type == "product" && language == $locale && $collectionSlug in collection[]->slug.current] | order(name asc){    _id, name, modelNumber, slug,    "collectionSlugs": collection[]->slug.current,    images[]{   _key,  _type,  asset,  "imageUrl": asset->url,  "assetUrl": asset->url,  alt }  }
 export type LocalizedProductsByCollectionQueryResult = Array<{
   _id: string
   name: string | null
   modelNumber: string | null
   slug: string | null
-  collectionSlug: string
+  collectionSlugs: Array<string>
   images: Array<{
     _key: string
     _type: 'image'
@@ -1533,7 +1558,7 @@ export type CollectionsByLocaleQueryResult = Array<{
   _type: 'collection'
   title: string
   slug: string
-  language: 'en-GB' | 'en-US' | 'fr-FR' | null
+  language: string | null
   image: {
     _key: null
     _type: 'image'
@@ -1570,7 +1595,7 @@ export type CollectionBySlugQueryResult = {
   _type: 'collection'
   title: string
   slug: string
-  language: 'en-GB' | 'en-US' | 'fr-FR' | null
+  language: string | null
   image: {
     _key: null
     _type: 'image'
@@ -1604,16 +1629,16 @@ import '@sanity/client'
 declare module '@sanity/client' {
   interface SanityQueries {
     '*[_type == "settings"][0]': SettingsQueryResult
-    '\n  *[_type == \'page\' && slug.current == $slug][0]{\n    _id,\n    _type,\n    name,\n    slug,\n    heading,\n    subheading,\n    "pageBuilder": pageBuilder[]{\n      ...,\n      _type == "callToAction" => {\n        ...,\n        button {\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n  }\n\n      }\n\n        }\n      },\n      _type == "infoSection" => {\n        content[]{\n          ...,\n          markDefs[]{\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n  }\n\n          }\n        }\n      },\n    },\n  }\n': GetPageQueryResult
-    '\n  *[_type == "page" && defined(slug.current)] | order(_type asc) {\n    "slug": slug.current,\n    _type,\n    _updatedAt,\n  }\n': SitemapDataResult
+    '\n  *[_type == \'page\' && slug.current == $slug && language == $locale][0]{\n    _id,\n    _type,\n    name,\n    slug,\n    heading,\n    subheading,\n    "pageBuilder": pageBuilder[]{\n      ...,\n      _type == "callToAction" => {\n        ...,\n        button {\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n  }\n\n      }\n\n        }\n      },\n      _type == "infoSection" => {\n        content[]{\n          ...,\n          markDefs[]{\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n  }\n\n          }\n        }\n      },\n    },\n  }\n': GetPageQueryResult
+    '\n  *[_type in ["page", "productPage", "collection"] && defined(slug.current)] | order(_type asc) {\n    "slug": slug.current,\n    _type,\n    _updatedAt,\n    "language": language,\n  }\n': SitemapDataResult
     '\n  *[_type == "page" && defined(slug.current)]\n  {"slug": slug.current}\n': PagesSlugsResult
     '\n  *[_type == "header" && (!defined($locale) || language == $locale)][0]{\n    _id, _type, language, logoText,\n    logoImage{ _type, asset, crop, hotspot },\n    navLinks[]{ _key, title, href }\n  }\n': HeaderQueryResult
     '\n  *[_type == "footer" && (!defined($locale) || language == $locale)][0]{\n    _id, _type, language,\n    footerLinks[]{ _key, title, href },\n    footerText\n  }\n': FooterQueryResult
     '\n  *[_type == "product"] | order(name asc){\n    _id, _type, name, modelNumber, slug,\n    images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n    features,\n    links[]{ _key, label, url }\n  }\n': ProductsQueryResult
-    '\n  *[_type == "product" && slug == $slug][0]{\n    \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description }\n\n  }\n': ProductBySlugQueryResult
-    '\n  *[_type == "productPage" && slug.current == $slug][0]{\n    _id, _type, title, slug,\n    "products": products[]{\n      _key, isDefault,\n      "product": product->{ \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description }\n }\n    },\n    "defaultProduct": products[isDefault == true][0].product->{ \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description }\n },\n    \n  components[] {\n    _key, _type,\n    ...@-> {\n      ...select(\n        \n  _type == "highlightsHero" => {\n    _id, _type, title, description, modelNumber,\n    bgDesktopImage{ _type, asset, "url": asset->url, alt },\n    bgMobileImage{ _type, asset, "url": asset->url, alt }\n  }\n,\n        \n  _type == "iconOverview" => {\n    _id, _type, title,\n    "icons": icons[]->{\n      _id, _type, title,\n      "iconImageUrl": iconImage.asset->url,\n      "iconImageAlt": iconImage.alt\n    }\n  }\n,\n        \n  _type == "contentImageBlock" => {\n    _id, _type, title, description,\n    image{ _type, asset, "url": asset->url, alt },\n    imagePosition\n  }\n,\n        \n  _type == "featureOverviewBlock" => {\n    _id, _type, title,\n    columns[]{\n      _key, title, description,\n      image{ _type, asset, "url": asset->url, alt },\n      icon{ _type, asset, "url": asset->url, alt }\n    }\n  }\n,\n        \n  _type == "legacyMigration" => {\n    _id, _type, title,\n    "externalAssets": externalAssets,\n    bodyHtml, legacyClassName\n  }\n\n      )\n    }\n  }\n,\n    metaTitle, metaDescription\n  }\n': ProductPageBySlugQueryResult
-    '\n  *[_type == "productPage" && language == $locale && slug.current == $model][0]{\n    _id, _type, title, slug,\n    "products": products[]{\n      _key, isDefault,\n      "product": product->{ \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description }\n }\n    },\n    "defaultProduct": products[isDefault == true][0].product->{ \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description }\n },\n    \n  components[] {\n    _key, _type,\n    ...@-> {\n      ...select(\n        \n  _type == "highlightsHero" => {\n    _id, _type, title, description, modelNumber,\n    bgDesktopImage{ _type, asset, "url": asset->url, alt },\n    bgMobileImage{ _type, asset, "url": asset->url, alt }\n  }\n,\n        \n  _type == "iconOverview" => {\n    _id, _type, title,\n    "icons": icons[]->{\n      _id, _type, title,\n      "iconImageUrl": iconImage.asset->url,\n      "iconImageAlt": iconImage.alt\n    }\n  }\n,\n        \n  _type == "contentImageBlock" => {\n    _id, _type, title, description,\n    image{ _type, asset, "url": asset->url, alt },\n    imagePosition\n  }\n,\n        \n  _type == "featureOverviewBlock" => {\n    _id, _type, title,\n    columns[]{\n      _key, title, description,\n      image{ _type, asset, "url": asset->url, alt },\n      icon{ _type, asset, "url": asset->url, alt }\n    }\n  }\n,\n        \n  _type == "legacyMigration" => {\n    _id, _type, title,\n    "externalAssets": externalAssets,\n    bodyHtml, legacyClassName\n  }\n\n      )\n    }\n  }\n,\n    metaTitle, metaDescription\n  }\n': LocalizedProductPageQueryResult
-    '\n  *[_type == "product" && language == $locale && collection->slug.current == $collection] | order(name asc){\n    _id, name, modelNumber, slug,\n    "collectionSlug": collection->slug.current,\n    images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n }\n  }\n': LocalizedProductsByCollectionQueryResult
+    '\n  *[_type == "product" && slug == $slug][0]{\n    \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description, "versionSlug": versionSlug.current }\n\n  }\n': ProductBySlugQueryResult
+    '\n  *[_type == "productPage" && slug.current == $slug][0]{\n    _id, _type, title, slug,\n    "products": products[]{\n      _key, isDefault,\n      "product": product->{ \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description, "versionSlug": versionSlug.current }\n }\n    },\n    "defaultProduct": products[isDefault == true][0].product->{ \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description, "versionSlug": versionSlug.current }\n },\n    \n  components[] {\n    _key, _type,\n    ...@-> {\n      ...select(\n        \n  _type == "highlightsHero" => {\n    _id, _type, title, description, modelNumber,\n    bgDesktopImage{ _type, asset, "url": asset->url, alt },\n    bgMobileImage{ _type, asset, "url": asset->url, alt }\n  }\n,\n        \n  _type == "iconOverview" => {\n    _id, _type, title,\n    "icons": icons[]->{\n      _id, _type, title,\n      "iconImageUrl": iconImage.asset->url,\n      "iconImageAlt": iconImage.alt\n    }\n  }\n,\n        \n  _type == "contentImageBlock" => {\n    _id, _type, title, description,\n    image{ _type, asset, "url": asset->url, alt },\n    imagePosition\n  }\n,\n        \n  _type == "featureOverviewBlock" => {\n    _id, _type, title,\n    columns[]{\n      _key, title, description,\n      image{ _type, asset, "url": asset->url, alt },\n      icon{ _type, asset, "url": asset->url, alt }\n    }\n  }\n,\n        \n  _type == "legacyMigration" => {\n    _id, _type, title,\n    "externalAssets": externalAssets,\n    bodyHtml, legacyClassName\n  }\n\n      )\n    }\n  }\n,\n    metaTitle, metaDescription\n  }\n': ProductPageBySlugQueryResult
+    '\n  *[_type == "productPage" && language == $locale && slug.current == $slug][0]{\n    _id, _type, title, slug,\n    "products": products[]{\n      _key, isDefault,\n      "product": product->{ \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description, "versionSlug": versionSlug.current }\n }\n    },\n    "defaultProduct": products[isDefault == true][0].product->{ \n  _id, name, modelNumber, slug,\n  "imageUrls": images[].asset->url,\n  images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n  features, links,\n  versions{ versionName, description, "versionSlug": versionSlug.current }\n },\n    \n  components[] {\n    _key, _type,\n    ...@-> {\n      ...select(\n        \n  _type == "highlightsHero" => {\n    _id, _type, title, description, modelNumber,\n    bgDesktopImage{ _type, asset, "url": asset->url, alt },\n    bgMobileImage{ _type, asset, "url": asset->url, alt }\n  }\n,\n        \n  _type == "iconOverview" => {\n    _id, _type, title,\n    "icons": icons[]->{\n      _id, _type, title,\n      "iconImageUrl": iconImage.asset->url,\n      "iconImageAlt": iconImage.alt\n    }\n  }\n,\n        \n  _type == "contentImageBlock" => {\n    _id, _type, title, description,\n    image{ _type, asset, "url": asset->url, alt },\n    imagePosition\n  }\n,\n        \n  _type == "featureOverviewBlock" => {\n    _id, _type, title,\n    columns[]{\n      _key, title, description,\n      image{ _type, asset, "url": asset->url, alt },\n      icon{ _type, asset, "url": asset->url, alt }\n    }\n  }\n,\n        \n  _type == "legacyMigration" => {\n    _id, _type, title,\n    "externalAssets": externalAssets,\n    bodyHtml, legacyClassName\n  }\n\n      )\n    }\n  }\n,\n    metaTitle, metaDescription\n  }\n': LocalizedProductPageQueryResult
+    '\n  *[_type == "product" && language == $locale && $collectionSlug in collection[]->slug.current] | order(name asc){\n    _id, name, modelNumber, slug,\n    "collectionSlugs": collection[]->slug.current,\n    images[]{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n }\n  }\n': LocalizedProductsByCollectionQueryResult
     '\n  *[_type == "collection" && language == $locale] | order(title asc){\n    _id, _type, title, "slug": slug.current, language,\n    image{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n    description\n  }\n': CollectionsByLocaleQueryResult
     '\n  *[_type == "collection" && language == $locale && slug.current == $collectionSlug][0]{\n    _id, _type, title, "slug": slug.current, language,\n    image{ \n  _key,\n  _type,\n  asset,\n  "imageUrl": asset->url,\n  "assetUrl": asset->url,\n  alt\n },\n    description\n  }\n': CollectionBySlugQueryResult
   }

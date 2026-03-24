@@ -8,7 +8,7 @@ import {colorInput} from '@sanity/color-input'
 import {documentInternationalization} from '@sanity/document-internationalization'
 import {presentationTool, defineDocuments, defineLocations} from 'sanity/presentation'
 import {assist} from '@sanity/assist'
-import {DEFAULT_LOCALE, isValidLocale, SUPPORTED_LANGUAGES} from 'shared'
+import {DEFAULT_LOCALE, SUPPORTED_LANGUAGES} from 'shared'
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'wh4ayjq9'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'internationalization'
@@ -58,10 +58,6 @@ export default defineConfig({
           {
             route: '/:locale/products/:slug',
             filter: `_type == "productPage" && language == $locale && slug.current == $slug`,
-          },
-          {
-            route: '/:locale/products/:slug/:version',
-            filter: `_type == "productPage" && language == $locale && slug.current == $slug && versions.versionName == $version`,
           },
           {
             route: '/:locale/collections/:slug',

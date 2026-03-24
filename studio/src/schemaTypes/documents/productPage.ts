@@ -46,6 +46,12 @@ export const productPage = defineType({
               title: 'Product',
               type: 'reference',
               to: [{type: 'product'}],
+              options: {
+                filter: ({document}) => ({
+                  filter: 'language == $language',
+                  params: {language: document.language},
+                }),
+              },
               validation: (Rule) => Rule.required(),
             }),
             defineField({

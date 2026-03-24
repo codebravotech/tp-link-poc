@@ -2,27 +2,34 @@ import {notFound} from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import {sanityFetch} from '@/sanity/lib/live'
-import {localizedProductsByCollectionQuery} from '@/sanity/lib/queries'
-import {isValidLocale} from '@/sanity/lib/locale'
+import {collectionBySlugQuery, localizedProductsByCollectionQuery} from '@/sanity/lib/queries'
+import {isValidLocale, LOCALES} from '@/sanity/lib/locale'
 
 interface CollectionPageProps {
   params: Promise<{locale: string; slug: string}>
 }
 
 export default async function CollectionPage({params}: CollectionPageProps) {
-  const {locale, slug: collection} = await params
+  const {locale, slug: collectionSlug} = await params
   if (!isValidLocale(locale)) notFound()
 
   const {data: products} = await sanityFetch({
     query: localizedProductsByCollectionQuery,
-    params: {locale, collection},
+    params: {locale, collectionSlug},
   })
+  const {data: collectionData} = await sanityFetch({
+    query: collectionBySlugQuery,
+    params: {locale, collectionSlug},
+  })
+  const {title} = collectionData ?? {}
+  const localeTitle = LOCALES?.find(({value}) => value === locale)?.title ?? locale
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
-      <h1 className="text-2xl font-bold text-slate-900">Collection: {collection}</h1>
+      <h1 className="text-2xl font-bold text-slate-900">Collection: {title}</h1>
       <p className="mt-1 text-slate-600">
-        Locale: {locale}. {products?.length ?? 0} product(s).
+        Locale: {localeTitle}. {products?.length ?? 0} product
+        {(products?.length ?? 0) > 1 ? 's' : ''}.
       </p>
       <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products?.map((product: any) => (

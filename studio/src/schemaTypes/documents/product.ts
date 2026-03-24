@@ -43,7 +43,18 @@ export const product = defineType({
       name: 'collection',
       title: 'Collection',
       type: 'array',
-      of: [{type: 'reference', to: [{type: 'collection'}]}],
+      of: [
+        {
+          type: 'reference',
+          to: [{type: 'collection'}],
+          options: {
+            filter: ({document}) => ({
+              filter: 'language == $language',
+              params: {language: document.language},
+            }),
+          },
+        },
+      ],
       validation: (Rule) => Rule.required(),
       readOnly: adminOnlyReadOnly,
     }),
@@ -103,7 +114,7 @@ export const product = defineType({
           options: {
             source: (_, {parent}) => {
               const p = parent as {versionName?: string; description?: string}
-              return [p?.versionName, p?.description].filter(Boolean).join(' ')
+              return [p?.versionName?.replace('.', '_'), p?.description].filter(Boolean).join('_')
             },
             maxLength: 96,
           },

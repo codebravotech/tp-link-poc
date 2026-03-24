@@ -17,6 +17,7 @@ export default async function AllCollectionsPage({params}: AllCollectionsPagePro
     query: collectionsByLocaleQuery,
     params: {locale},
   })
+  const localeTitle = LOCALES?.find(({value}) => value === locale)?.title ?? locale
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
@@ -35,7 +36,7 @@ export default async function AllCollectionsPage({params}: AllCollectionsPagePro
         ))}
       </div>
       <h1 className="text-3xl font-bold text-slate-900">Product Collections</h1>
-      <p className="mt-1 text-slate-600">Browse by collection. Locale: {locale}.</p>
+      <p className="mt-1 text-slate-600">Browse by collection. Locale: {localeTitle}.</p>
       <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {collections?.map((collection: any) => {
           const slug = collection.slug ?? undefined

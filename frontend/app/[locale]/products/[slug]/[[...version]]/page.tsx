@@ -5,6 +5,7 @@ import {isValidLocale} from '@/sanity/lib/locale'
 import ProductHeroCarousel from '@/app/components/Carousel/ProductHero'
 import {VersionSwitcher} from '@/app/components/VersionSwitcher'
 import {productComponentMap} from '@/app/lib/productComponentMap'
+import {stegaClean} from 'next-sanity'
 
 interface ProductPageProps {
   params: Promise<{
@@ -17,50 +18,54 @@ interface ProductPageProps {
 function getActiveEntry(
   entries: any[],
   versionSegments: string[] | undefined,
-): {activeEntry: any; defaultEntry: any; currentVersionName: string | null} {
+): {activeEntry: any; defaultEntry: any; currentVersionSlug: string | null} {
   if (!entries.length) {
-    return {activeEntry: null, defaultEntry: null, currentVersionName: null}
+    return {activeEntry: null, defaultEntry: null, currentVersionSlug: null}
   }
 
   const defaultEntry = entries.find((e: any) => e.isDefault) ?? entries[0]
-  const requestedVersionName =
+  const requestedVersionSlug =
     versionSegments && versionSegments[0] ? decodeURIComponent(versionSegments[0]) : null
 
-  if (!requestedVersionName) {
+  if (!requestedVersionSlug) {
     return {
       activeEntry: defaultEntry,
       defaultEntry,
-      currentVersionName: defaultEntry.product?.versions?.versionName ?? null,
+      currentVersionSlug: defaultEntry.product?.versions?.versionSlug ?? null,
     }
   }
 
   const matchingEntry =
-    entries.find((entry: any) => entry.product?.versions?.versionName === requestedVersionName) ??
-    null
+    entries.find(
+      (entry: any) =>
+        stegaClean(entry.product?.versions?.versionSlug) === stegaClean(requestedVersionSlug),
+    ) ?? null
 
   const activeEntry = matchingEntry ?? defaultEntry
   return {
     activeEntry,
     defaultEntry,
-    currentVersionName: activeEntry.product?.versions?.versionName ?? null,
+    currentVersionSlug: activeEntry.product?.versions?.versionSlug ?? null,
   }
 }
 
 export default async function LocalizedProductPage({params}: ProductPageProps) {
-  const {locale, slug: model, version: versionSegments} = await params
+  const {locale, slug, version: versionSegments} = await params
   if (!isValidLocale(locale)) notFound()
 
   const {data: productPage} = await sanityFetch({
     query: localizedProductPageQuery,
-    params: {locale, model},
+    params: {locale, slug},
   })
+
+  console.log('PRODUCT PAGE: ', productPage)
 
   if (!productPage || !(productPage as any).products?.length) {
     notFound()
   }
 
   const entries = (productPage as any).products ?? []
-  const {activeEntry, defaultEntry, currentVersionName} = getActiveEntry(entries, versionSegments)
+  const {activeEntry, defaultEntry, currentVersionSlug} = getActiveEntry(entries, versionSegments)
 
   const effectiveEntry = activeEntry?.product
     ? activeEntry
@@ -92,18 +97,18 @@ export default async function LocalizedProductPage({params}: ProductPageProps) {
               {entries.length > 1 && (
                 <VersionSwitcher
                   options={entries
-                    .filter((entry: any) => entry.product?.versions?.versionName)
+                    .filter((entry: any) => entry.product?.versions?.versionSlug)
                     .map((entry: any) => ({
                       key: entry._key,
-                      versionName: entry.product!.versions!.versionName,
+                      versionSlug: entry.product!.versions!.versionSlug,
                       label:
                         entry.product!.versions!.description ??
                         entry.product!.versions!.versionName,
                       isDefault: entry.isDefault,
                     }))}
-                  currentVersionName={currentVersionName}
+                  currentVersionSlug={currentVersionSlug}
                   locale={locale}
-                  model={model}
+                  model={slug}
                 />
               )}
             </div>
