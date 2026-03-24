@@ -28,7 +28,7 @@ export function resolveOpenGraphImage(
 }
 
 // Depending on the type of link, we need to fetch the corresponding page or URL.  Otherwise return null.
-export function linkResolver(link: Link | DereferencedLink | undefined) {
+export function linkResolver(link: Link | DereferencedLink | undefined, locale?: string) {
   if (!link) return null
 
   if (!link.linkType && link.href) {
@@ -40,7 +40,7 @@ export function linkResolver(link: Link | DereferencedLink | undefined) {
       return link.href || null
     case 'page':
       if (link?.page && typeof link.page === 'string') {
-        return `/${link.page}`
+        return locale ? `/${locale}/${link.page}` : `/${link.page}`
       }
       return null
     default:

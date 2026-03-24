@@ -10,6 +10,7 @@ import {PageBuilderSection} from '@/sanity/lib/types'
 
 type PageBuilderPageProps = {
   page: GetPageQueryResult
+  locale?: string
 }
 
 type PageData = {
@@ -25,9 +26,11 @@ type PageData = {
 function RenderSections({
   pageBuilderSections,
   page,
+  locale,
 }: {
   pageBuilderSections: PageBuilderSection[]
   page: GetPageQueryResult
+  locale?: string
 }) {
   if (!page) {
     return null
@@ -47,6 +50,7 @@ function RenderSections({
           block={block}
           pageId={page._id}
           pageType={page._type}
+          locale={locale}
         />
       ))}
     </div>
@@ -75,7 +79,7 @@ function RenderEmptyState({page}: {page: GetPageQueryResult}) {
   )
 }
 
-export default function PageBuilder({page}: PageBuilderPageProps) {
+export default function PageBuilder({page, locale}: PageBuilderPageProps) {
   const pageBuilderSections = useOptimistic<
     PageBuilderSection[] | undefined,
     SanityDocument<PageData>
@@ -101,7 +105,7 @@ export default function PageBuilder({page}: PageBuilderPageProps) {
   })
 
   return pageBuilderSections && pageBuilderSections.length > 0 ? (
-    <RenderSections pageBuilderSections={pageBuilderSections} page={page} />
+    <RenderSections pageBuilderSections={pageBuilderSections} page={page} locale={locale} />
   ) : (
     <RenderEmptyState page={page} />
   )

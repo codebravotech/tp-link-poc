@@ -39,7 +39,7 @@ export default async function AllCollectionsPage({params}: AllCollectionsPagePro
       <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {collections?.map((collection: any) => {
           const slug = collection.slug ?? undefined
-          const href = slug ? `/${locale}/products/${slug}` : '#'
+          const href = slug ? `/${locale}/collections/${slug}` : '#'
           return (
             <li key={collection._id}>
               <Link

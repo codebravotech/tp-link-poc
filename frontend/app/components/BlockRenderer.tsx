@@ -10,6 +10,7 @@ type BlockProps = {
   block: PageBuilderSection
   pageId: string
   pageType: string
+  locale?: string
 }
 
 type BlocksType = {
@@ -24,7 +25,7 @@ const Blocks = {
 /**
  * Used by the <PageBuilder>, this component renders a the component that matches the block type.
  */
-export default function BlockRenderer({block, index, pageId, pageType}: BlockProps) {
+export default function BlockRenderer({block, index, pageId, pageType, locale}: BlockProps) {
   // Block does exist
   if (typeof Blocks[block._type] !== 'undefined') {
     return (
@@ -42,6 +43,7 @@ export default function BlockRenderer({block, index, pageId, pageType}: BlockPro
           index: index,
           pageId: pageId,
           pageType: pageType,
+          locale: locale,
         })}
       </div>
     )

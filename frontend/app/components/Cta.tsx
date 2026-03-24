@@ -9,12 +9,12 @@ import {ExtractPageBuilderType} from '@/sanity/lib/types'
 type CtaProps = {
   block: ExtractPageBuilderType<'callToAction'>
   index: number
-  // Needed if you want to createDataAttributes to do non-text overlays in Presentation (Visual Editing)
   pageType: string
   pageId: string
+  locale?: string
 }
 
-export default function CTA({block}: CtaProps) {
+export default function CTA({block, locale}: CtaProps) {
   const {heading, eyebrow, body = [], button, image, theme, contentAlignment} = block
 
   const isDark = theme === 'dark'
@@ -38,7 +38,7 @@ export default function CTA({block}: CtaProps) {
             )}
             {body && (
               <div className="lg:text-left">
-                <PortableText value={body as PortableTextBlock[]} className="dark:prose-invert" />
+                <PortableText value={body as PortableTextBlock[]} className="dark:prose-invert" locale={locale} />
               </div>
             )}
 
@@ -46,6 +46,7 @@ export default function CTA({block}: CtaProps) {
               <div className="flex mt-4">
                 <ResolvedLink
                   link={button?.link}
+                  locale={locale}
                   className="rounded-full flex gap-2 font-mono text-sm whitespace-nowrap items-center bg-black dark:bg-white hover:bg-blue focus:bg-blue py-3 px-6 text-white dark:text-black dark:hover:text-white transition-colors duration-200"
                 >
                   {button?.buttonText}

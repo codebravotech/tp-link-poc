@@ -15,14 +15,15 @@ interface ProductCardProps {
   title: string
   image: any
   slug: string | null
+  locale: string
 }
 
-export function ProductCard({id, title, image, slug}: ProductCardProps) {
+export function ProductCard({id, title, image, slug, locale}: ProductCardProps) {
   const src = urlFor(image)?.width(400).height(400).url() ?? null
 
   return (
     <Link
-      href={`/products/${slug ?? id}`}
+      href={`/${locale}/products/${slug ?? id}`}
       className="group block overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
     >
       <div className="relative aspect-square bg-slate-100">

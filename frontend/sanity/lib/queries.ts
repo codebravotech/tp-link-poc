@@ -46,10 +46,11 @@ export const getPageQuery = defineQuery(`
 `)
 
 export const sitemapData = defineQuery(`
-  *[_type == "page" && defined(slug.current)] | order(_type asc) {
+  *[_type in ["page", "productPage", "collection"] && defined(slug.current)] | order(_type asc) {
     "slug": slug.current,
     _type,
     _updatedAt,
+    "language": language,
   }
 `)
 

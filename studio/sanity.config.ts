@@ -67,29 +67,6 @@ export default defineConfig({
             route: '/:locale/collections/:slug',
             filter: `_type == "collection" && language == $locale && slug.current == $slug`,
           },
-
-          {
-            route: '/:locale/products/:collection',
-            resolve(ctx) {
-              const locale = ctx.params.locale
-              if (!locale || !isValidLocale(locale)) return undefined
-              return {
-                filter: `_type == "collection" && language == $locale && slug.current == $collection`,
-                params: {locale, collection: ctx.params.collection},
-              }
-            },
-          },
-          {
-            route: '/:locale/products/:collection/:model',
-            resolve(ctx) {
-              const locale = ctx.params.locale
-              if (!locale || !isValidLocale(locale)) return undefined
-              return {
-                filter: `_type == "productPage" && language == $locale && slug.current == $model`,
-                params: {locale, collection: ctx.params.collection, model: ctx.params.model},
-              }
-            },
-          },
         ]),
         locations: {
           page: defineLocations({
@@ -116,25 +93,9 @@ export default defineConfig({
               title: 'title',
               slug: 'slug.current',
               locale: 'language',
-
-              version: 'versions',
             },
 
             resolve: (doc) => {
-              const versioned = doc?.version
-                ? {
-                    title: doc?.title || 'Untitled',
-                    href: resolveHref(
-                      'versionedProductPage',
-                      doc?.locale || DEFAULT_LOCALE,
-                      doc?.slug,
-                      doc?.version,
-                    )!,
-                  }
-                : undefined
-
-              console.log('VERSIONED: ', {doc, versioned})
-
               return {
                 message: 'Open in Presentation for visual editing',
                 locations: [
@@ -142,7 +103,7 @@ export default defineConfig({
                     title: doc?.title || 'Untitled',
                     href: resolveHref('productPage', doc?.locale || DEFAULT_LOCALE, doc?.slug)!,
                   },
-                ].concat(versioned ? [versioned] : []),
+                ],
               }
             },
           }),

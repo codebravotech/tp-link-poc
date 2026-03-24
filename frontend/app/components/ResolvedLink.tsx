@@ -7,11 +7,11 @@ interface ResolvedLinkProps {
   link: DereferencedLink
   children: React.ReactNode
   className?: string
+  locale?: string
 }
 
-export default function ResolvedLink({link, children, className}: ResolvedLinkProps) {
-  // resolveLink() is used to determine the type of link and return the appropriate URL.
-  const resolvedLink = linkResolver(link)
+export default function ResolvedLink({link, children, className, locale}: ResolvedLinkProps) {
+  const resolvedLink = linkResolver(link, locale)
 
   if (typeof resolvedLink === 'string') {
     return (

@@ -15,9 +15,11 @@ import Image from '@/app/components/SanityImage'
 export default function CustomPortableText({
   className,
   value,
+  locale,
 }: {
   className?: string
   value: PortableTextBlock[]
+  locale?: string
 }) {
   const components: PortableTextComponents = {
     types: {
@@ -96,7 +98,7 @@ export default function CustomPortableText({
     },
     marks: {
       link: ({children, value: link}) => {
-        return <ResolvedLink link={link}>{children}</ResolvedLink>
+        return <ResolvedLink link={link} locale={locale}>{children}</ResolvedLink>
       },
     },
   }
