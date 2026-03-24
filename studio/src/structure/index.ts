@@ -60,7 +60,11 @@ function localeGroupedList(
   label: string,
   apiVersion: string,
   icon: ComponentType<{style?: React.CSSProperties}>,
+  extraFilter?: string,
 ) {
+  const baseFilter = `_type == "${schemaType}"`
+  const fullFilter = extraFilter ? `${baseFilter} && ${extraFilter}` : baseFilter
+
   return S.list()
     .title(label)
 
@@ -69,36 +73,28 @@ function localeGroupedList(
         .title(`All ${label}`)
         .id(`${schemaType}-all`)
         .icon(icon)
-        .child(S.documentTypeList(schemaType).title(`All ${label}`)),
+        .child(
+          S.documentList()
+            .id(`${schemaType}-all-list`)
+            .title(`All ${label}`)
+            .schemaType(schemaType)
+            .apiVersion(`v${apiVersion}`)
+            .filter(fullFilter),
+        ),
       ...LOCALES.map(({value, title}) =>
         S.listItem()
           .title(title)
           .id(`${schemaType}-${value}`)
           .icon(createFlagIcon(value))
           .child(
-            S.documentList()
+            S.documentTypeList(schemaType)
               .id(`${schemaType}-${value}-list`)
               .title(`${label} — ${title}`)
               .schemaType(schemaType)
               .apiVersion(`v${apiVersion}`)
-              .filter(`_type == "${schemaType}" && language == $locale`)
+              .filter(`${fullFilter} && language == $locale`)
               .params({locale: value})
-              .initialValueTemplates([
-                S.initialValueTemplateItem(`${schemaType}-${value}`),
-              ])
-              .menuItems([
-                S.menuItem()
-                  .title(`Create new (${title})`)
-                  .icon(AddDocumentIcon)
-                  .intent({
-                    type: 'create',
-                    params: {type: schemaType, template: `${schemaType}-${value}`},
-                  }),
-              ])
-              .canHandleIntent(
-                (intentName, params) =>
-                  intentName === 'create' && params.template === `${schemaType}-${value}`,
-              ),
+              .initialValueTemplates([S.initialValueTemplateItem(`${schemaType}-${value}`)]),
           ),
       ),
     ])
@@ -151,7 +147,14 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
                 .title('Landing Pages')
                 .icon(ComposeIcon)
                 .child(
-                  localeGroupedList(S, 'page', 'Landing Pages', apiVersion, ComposeIcon),
+                  localeGroupedList(
+                    S,
+                    'page',
+                    'Landing Pages',
+                    apiVersion,
+                    ComposeIcon,
+                    '!(_id match "homePage*")',
+                  ),
                 ),
             ]),
         ),

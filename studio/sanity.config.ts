@@ -85,14 +85,18 @@ export default defineConfig({
         ]),
         locations: {
           page: defineLocations({
-            select: {name: 'name', slug: 'slug.current', locale: 'language'},
+            select: {_id: '_id', name: 'name', slug: 'slug.current', locale: 'language'},
             resolve: (doc) => {
+              if (!doc?.slug && !doc?._id?.includes('homePage')) {
+                return undefined
+              }
               const href = resolveHref('page', doc?.locale || DEFAULT_LOCALE, doc?.slug)!
+              const name = doc?.name || doc?._id?.includes('homePage') ? 'Home' : 'Untitled'
               return {
-                message: 'Open in visual editor',
+                message: 'Open in Presentation for visual editing',
                 locations: [
                   {
-                    title: doc?.name || 'Untitled',
+                    title: name,
                     href,
                   },
                 ],
@@ -101,10 +105,11 @@ export default defineConfig({
           }),
           productPage: defineLocations({
             select: {title: 'title', slug: 'slug.current', locale: 'language'},
+
             resolve: (doc) => {
               const href = resolveHref('productPage', doc?.locale || DEFAULT_LOCALE, doc?.slug)!
               return {
-                message: 'Open in visual editor',
+                message: 'Open in Presentation for visual editing',
                 locations: [
                   {
                     title: doc?.title || 'Untitled',

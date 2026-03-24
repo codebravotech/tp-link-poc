@@ -17,7 +17,12 @@ export const page = defineType({
       name: 'name',
       title: 'Name',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      hidden: ({document}) => document?._id?.includes('homePage') ?? false,
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          if (context.document?._id?.includes('homePage')) return true
+          return value ? true : 'Name is required'
+        }),
     }),
 
     defineField({

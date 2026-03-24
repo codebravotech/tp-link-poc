@@ -15,8 +15,7 @@ export default defineCliConfig({
     projectId,
     dataset,
   },
-  deployment: {autoUpdates: true}},
-
+  deployment: {autoUpdates: true},
   studioHost: process.env.SANITY_STUDIO_STUDIO_HOST || '', // Visit https://www.sanity.io/docs/studio/environment-variables to learn more about using environment variables for local & production.
   typegen: {
     path: './src/**/*.{ts,tsx,js,jsx}',
