@@ -20,6 +20,7 @@ import button from './objects/button'
 import {blockContentTextOnly} from './objects/blockContentTextOnly'
 import {navLink} from './objects/navLink'
 import {featureColumn} from './objects/featureColumn'
+import {insertMenuPreview} from './documents/insertMenuPreview'
 
 export const schemaTypes = [
   // Singletons
@@ -38,6 +39,7 @@ export const schemaTypes = [
   contentImageBlock,
   featureOverviewBlock,
   legacyMigration,
+  insertMenuPreview,
   // Objects
   button,
   blockContent,

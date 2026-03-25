@@ -9,6 +9,7 @@ import {documentInternationalization} from '@sanity/document-internationalizatio
 import {presentationTool, defineDocuments, defineLocations} from 'sanity/presentation'
 import {assist} from '@sanity/assist'
 import {DEFAULT_LOCALE, SUPPORTED_LANGUAGES} from 'shared'
+import {i18nTypes} from 'shared/locale'
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'wh4ayjq9'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'internationalization'
@@ -125,7 +126,7 @@ export default defineConfig({
     colorInput(),
     documentInternationalization({
       supportedLanguages: [...SUPPORTED_LANGUAGES],
-      schemaTypes: ['collection', 'footer', 'header', 'page', 'product', 'productPage'],
+      schemaTypes: i18nTypes,
       languageField: 'language',
     }),
     unsplashImageAsset(),
@@ -133,7 +134,7 @@ export default defineConfig({
       translate: {
         document: {
           languageField: 'language',
-          documentTypes: ['footer', 'header', 'page', 'product', 'productPage'],
+          documentTypes: i18nTypes,
         },
       },
     }),
@@ -142,6 +143,8 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
-    templates: (prev) => prev.filter((t) => t.id !== t.schemaType),
+    templates: (prev) => {
+      return prev.filter((t) => !(t.id === t.schemaType && i18nTypes.includes(t.schemaType)))
+    },
   },
 })

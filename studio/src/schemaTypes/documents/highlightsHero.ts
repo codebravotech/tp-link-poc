@@ -4,6 +4,13 @@ export const highlightsHero = defineType({
   name: 'highlightsHero',
   title: 'Highlights Hero',
   type: 'document',
+  preview: {
+    prepare() {
+      return {
+        title: 'Insert Menu Previews',
+      }
+    },
+  },
   fields: [
     defineField({
       name: 'title',

@@ -43,6 +43,7 @@ const COMPONENT_TYPES = [
   'contentImageBlock',
   'featureOverviewBlock',
   'legacyMigration',
+  'insertMenuPreview',
 ] as const
 
 const COMPONENT_TITLES: Record<string, string> = {
@@ -52,6 +53,7 @@ const COMPONENT_TITLES: Record<string, string> = {
   contentImageBlock: 'Content Image Blocks',
   featureOverviewBlock: 'Feature Overview Blocks',
   legacyMigration: 'Legacy Migrations',
+  insertMenuPreview: 'Insert Menu Previews',
 }
 
 function localeGroupedList(
@@ -189,9 +191,9 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
             .title('Components')
             .items(
               S.documentTypeListItems()
-                .filter((item) =>
-                  COMPONENT_TYPES.includes(item.getId() as (typeof COMPONENT_TYPES)[number]),
-                )
+                .filter((item) => {
+                  return COMPONENT_TYPES.includes(item.getId() as (typeof COMPONENT_TYPES)[number])
+                })
                 .map((item) => {
                   const title = COMPONENT_TITLES[item.getId() ?? '']
                   return title ? item.title(title) : item

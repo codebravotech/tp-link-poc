@@ -16,3 +16,5 @@ export const SUPPORTED_LANGUAGES = LOCALES.map(({value, title}) => ({id: value, 
 export function isValidLocale(value: string): value is Locale {
   return SUPPORTED_LOCALES.includes(value as Locale)
 }
+
+export const i18nTypes = ['collection', 'footer', 'header', 'page', 'product', 'productPage']

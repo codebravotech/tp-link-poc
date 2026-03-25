@@ -10,7 +10,6 @@ export default function ReusablePageComponentsList({
   pageType: 'page' | 'productPage'
   components: any[]
 }) {
-  console.log(components)
   const componentsListAttr = dataAttr({
     id: pageId,
     type: pageType,

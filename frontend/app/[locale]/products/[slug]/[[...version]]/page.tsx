@@ -58,8 +58,6 @@ export default async function LocalizedProductPage({params}: ProductPageProps) {
     params: {locale, slug},
   })
 
-  console.log('PRODUCT PAGE: ', productPage)
-
   if (!productPage || !(productPage as any).products?.length) {
     notFound()
   }
@@ -139,8 +137,11 @@ export default async function LocalizedProductPage({params}: ProductPageProps) {
           </div>
         </div>
 
-        <ReusablePageComponentsList pageId={productPage._id} pageType="productPage" components={components} />
-        
+        <ReusablePageComponentsList
+          pageId={productPage._id}
+          pageType="productPage"
+          components={components}
+        />
       </article>
     </div>
   )

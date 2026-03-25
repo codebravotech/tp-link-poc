@@ -1,6 +1,7 @@
 import {defineField, defineType} from 'sanity'
 import {DocumentIcon} from '@sanity/icons'
 import {isUniquePerLanguage} from '../../lib/isUniquePerLanguage'
+import {PageBuilderInput} from '../../component/PageBuilderInput'
 
 /**
  * Page schema.  Define and edit the fields for the 'page' content type.
@@ -62,12 +63,40 @@ export const page = defineType({
       name: 'components',
       title: 'Reusable Components',
       type: 'array',
+      components: {
+        input: PageBuilderInput,
+      },
       of: [
-        {type: 'reference', name: 'highlightsHero', to: [{type: 'highlightsHero'}]},
-        {type: 'reference', name: 'iconOverview', to: [{type: 'iconOverview'}]},
-        {type: 'reference', name: 'contentImageBlock', to: [{type: 'contentImageBlock'}]},
-        {type: 'reference', name: 'featureOverviewBlock', to: [{type: 'featureOverviewBlock'}]},
-        {type: 'reference', name: 'legacyMigration', to: [{type: 'legacyMigration'}]},
+        {
+          type: 'reference',
+          name: 'highlightsHero',
+          title: 'Highlights Hero',
+          to: [{type: 'highlightsHero'}],
+        },
+        {
+          type: 'reference',
+          name: 'iconOverview',
+          title: 'Icon Overview',
+          to: [{type: 'iconOverview'}],
+        },
+        {
+          type: 'reference',
+          name: 'contentImageBlock',
+          title: 'Content Image Block',
+          to: [{type: 'contentImageBlock'}],
+        },
+        {
+          type: 'reference',
+          name: 'featureOverviewBlock',
+          title: 'Feature Overview Block',
+          to: [{type: 'featureOverviewBlock'}],
+        },
+        {
+          type: 'reference',
+          name: 'legacyMigration',
+          title: 'Legacy Migration',
+          to: [{type: 'legacyMigration'}],
+        },
       ],
     }),
   ],
